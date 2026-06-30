@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "Чёрная футболка Oversize",
+    "price": 120000,
+    "size": "S, M, L, XL",
+    "photo": "https://via.placeholder.com/400x500?text=Photo+1",
+    "description": "Хлопок 100%, свободный крой"
+  },
+  {
+    "id": 2,
+    "name": "Худи серое",
+    "price": 250000,
+    "size": "M, L, XL",
+    "photo": "https://via.placeholder.com/400x500?text=Photo+2",
+    "description": "Плотный флис, тёплое"
+  },
+  {
+    "id": 3,
+    "name": "Джинсы прямые",
+    "price": 300000,
+    "size": "30, 32, 34",
+    "photo": "https://via.placeholder.com/400x500?text=Photo+3",
+    "description": "Классическая посадка"
+  }
+]

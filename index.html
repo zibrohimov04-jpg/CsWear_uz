@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Магазин</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root{
+    --bg: var(--tg-theme-bg-color, #111111);
+    --text: var(--tg-theme-text-color, #f2f0ea);
+    --hint: var(--tg-theme-hint-color, #8a8a85);
+    --accent: #d8b25c;
+    --card: #1a1a1a;
+    --line: #2a2a2a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    padding-bottom:90px;
+  }
+  header{
+    padding:20px 16px 14px;
+    border-bottom:1px solid var(--line);
+  }
+  header .eyebrow{
+    font-size:11px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin-bottom:4px;
+  }
+  header h1{
+    margin:0;
+    font-size:22px;
+    font-weight:600;
+    letter-spacing:-0.3px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    padding:14px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+  .card img{
+    width:100%;
+    aspect-ratio:4/5;
+    object-fit:cover;
+    display:block;
+    background:#222;
+  }
+  .card-body{
+    padding:10px 10px 12px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    flex:1;
+  }
+  .card-name{
+    font-size:13.5px;
+    font-weight:600;
+    line-height:1.25;
+  }
+  .card-size{
+    font-size:11px;
+    color:var(--hint);
+  }
+  .card-price{
+    font-size:14px;
+    font-weight:700;
+    color:var(--accent);
+    margin-top:auto;
+  }
+  .add-btn{
+    margin-top:6px;
+    width:100%;
+    padding:8px 0;
+    border-radius:9px;
+    border:1px solid var(--accent);
+    background:transparent;
+    color:var(--accent);
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:0.3px;
+    cursor:pointer;
+  }
+  .add-btn.added{
+    background:var(--accent);
+    color:#111;
+  }
+  .cart-bar{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:var(--card);
+    border-top:1px solid var(--line);
+    padding:12px 16px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .cart-bar .count{
+    font-size:13px;
+    color:var(--hint);
+  }
+  .cart-bar .total{
+    font-size:15px;
+    font-weight:700;
+    color:var(--accent);
+  }
+  .checkout-btn{
+    background:var(--accent);
+    color:#111;
+    border:none;
+    padding:10px 18px;
+    border-radius:10px;
+    font-weight:700;
+    font-size:13.5px;
+    cursor:pointer;
+  }
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    display:none;
+    align-items:flex-end;
+    z-index:50;
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal{
+    background:var(--card);
+    width:100%;
+    border-radius:18px 18px 0 0;
+    padding:20px 18px 24px;
+    max-height:80vh;
+    overflow-y:auto;
+  }
+  .modal h2{
+    margin:0 0 14px;
+    font-size:17px;
+  }
+  .modal-line{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    padding:8px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .modal-line .nm{ flex:1; }
+  .modal-line button{
+    background:none;
+    border:none;
+    color:#c25b5b;
+    font-size:12px;
+    margin-left:10px;
+    cursor:pointer;
+  }
+  label{
+    display:block;
+    font-size:12px;
+    color:var(--hint);
+    margin:14px 0 5px;
+  }
+  input,textarea{
+    width:100%;
+    background:#222;
+    border:1px solid var(--line);
+    border-radius:9px;
+    padding:9px 10px;
+    color:var(--text);
+    font-size:13.5px;
+    font-family:inherit;
+  }
+  .empty{
+    text-align:center;
+    color:var(--hint);
+    font-size:13px;
+    padding:40px 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Tashkent · streetwear</div>
+  <h1>Каталог</h1>
+</header>
+
+<div id="grid" class="grid"></div>
+
+<div class="cart-bar">
+  <div>
+    <div class="count" id="cartCount">Корзина пуста</div>
+    <div class="total" id="cartTotal"></div>
+  </div>
+  <button class="checkout-btn" id="openCheckout">Оформить заказ</button>
+</div>
+
+<div class="modal-overlay" id="overlay">
+  <div class="modal">
+    <h2>Ваш заказ</h2>
+    <div id="orderLines"></div>
+    <label for="name">Имя</label>
+    <input id="name" placeholder="Как к вам обращаться">
+    <label for="phone">Телефон</label>
+    <input id="phone" placeholder="+998 90 000 00 00">
+    <label for="addr">Адрес доставки / самовывоз</label>
+    <textarea id="addr" rows="2" placeholder="Куда доставить или 'самовывоз'"></textarea>
+    <label for="note">Комментарий (размер, цвет и т.д.)</label>
+    <textarea id="note" rows="2" placeholder="Необязательно"></textarea>
+    <button class="checkout-btn" style="width:100%; margin-top:16px;" id="submitOrder">Отправить заказ продавцу</button>
+  </div>
+</div>
+
+<script>
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+let products = [];
+let cart = {}; // id -> qty
+
+const grid = document.getElementById('grid');
+const cartCount = document.getElementById('cartCount');
+const cartTotal = document.getElementById('cartTotal');
+const overlay = document.getElementById('overlay');
+const orderLines = document.getElementById('orderLines');
+
+function money(n){
+  return n.toLocaleString('ru-RU') + ' сум';
+}
+
+function render(){
+  grid.innerHTML = products.map(p => `
+    <div class="card">
+      <img src="${p.photo}" alt="${p.name}">
+      <div class="card-body">
+        <div class="card-name">${p.name}</div>
+        <div class="card-size">Размеры: ${p.size}</div>
+        <div class="card-price">${money(p.price)}</div>
+        <button class="add-btn ${cart[p.id] ? 'added' : ''}" onclick="addToCart(${p.id})">
+          ${cart[p.id] ? `В корзине (${cart[p.id]})` : 'Добавить'}
+        </button>
+      </div>
+    </div>
+  `).join('');
+  renderCartBar();
+}
+
+function addToCart(id){
+  cart[id] = (cart[id] || 0) + 1;
+  render();
+}
+
+function removeFromCart(id){
+  delete cart[id];
+  render();
+  renderModalLines();
+}
+
+function renderCartBar(){
+  const ids = Object.keys(cart);
+  if (ids.length === 0){
+    cartCount.textContent = 'Корзина пуста';
+    cartTotal.textContent = '';
+    return;
+  }
+  const totalItems = ids.reduce((s,id) => s + cart[id], 0);
+  const totalSum = ids.reduce((s,id) => s + cart[id] * products.find(p=>p.id==id).price, 0);
+  cartCount.textContent = `${totalItems} товар(а)`;
+  cartTotal.textContent = money(totalSum);
+}
+
+function renderModalLines(){
+  const ids = Object.keys(cart);
+  if (ids.length === 0){
+    orderLines.innerHTML = '<div class="empty">Корзина пуста. Добавьте товары.</div>';
+    return;
+  }
+  orderLines.innerHTML = ids.map(id => {
+    const p = products.find(p=>p.id==id);
+    return `<div class="modal-line">
+      <span class="nm">${p.name} × ${cart[id]}</span>
+      <span>${money(p.price * cart[id])}</span>
+      <button onclick="removeFromCart(${id})">убрать</button>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('openCheckout').onclick = () => {
+  renderModalLines();
+  overlay.classList.add('open');
+};
+overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove('open'); };
+
+document.getElementById('submitOrder').onclick = () => {
+  const ids = Object.keys(cart);
+  if (ids.length === 0){ alert('Добавьте хотя бы один товар'); return; }
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const addr = document.getElementById('addr').value.trim();
+  const note = document.getElementById('note').value.trim();
+  if (!name || !phone){ alert('Укажите имя и телефон'); return; }
+
+  const items = ids.map(id => {
+    const p = products.find(p=>p.id==id);
+    return { name: p.name, qty: cart[id], price: p.price, sum: p.price * cart[id] };
+  });
+  const total = items.reduce((s,i)=>s+i.sum,0);
+
+  const order = { name, phone, addr, note, items, total };
+
+  if (tg && tg.sendData){
+    tg.sendData(JSON.stringify(order));
+    tg.close();
+  } else {
+    // fallback for testing outside Telegram
+    console.log('ORDER', order);
+    alert('Заказ сформирован (тест вне Telegram):\n' + JSON.stringify(order, null, 2));
+  }
+};
+
+fetch('products.json')
+  .then(r => r.json())
+  .then(data => { products = data; render(); })
+  .catch(() => {
+    grid.innerHTML = '<div class="empty">Не удалось загрузить каталог</div>';
+  });
+</script>
+
+</body>
+</html>
