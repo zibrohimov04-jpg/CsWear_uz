@@ -4,7 +4,7 @@
     "name": "Vitality 2026",
     "price": 189000,
     "size": "S, M, L, XL",
-    "photo": "images/vitality.jpg",
+    "photo": "vitality.jpg",
     "description": "Официальная джерси Team Vitality, сезон 2026"
   },
   {
@@ -12,7 +12,7 @@
     "name": "Faze Clan",
     "price": 189000,
     "size": "S, M, L, XL",
-    "photo": "images/fazeclan.jpg",
+    "photo": "Faze Clan.jpg",
     "description": "Официальная джерси FaZe Clan"
   },
   {
@@ -20,7 +20,7 @@
     "name": "Team Spirit",
     "price": 189000,
     "size": "S, M, L, XL",
-    "photo": "images/teamspirit.jpg",
+    "photo": "Team Spirit.jpg",
     "description": "Официальная джерси Team Spirit"
   },
   {
@@ -28,7 +28,7 @@
     "name": "Falcons",
     "price": 189000,
     "size": "S, M, L, XL",
-    "photo": "images/falcons.jpg",
+    "photo": "Falcons.jpg",
     "description": "Официальная джерси Falcons"
   },
   {
@@ -36,7 +36,7 @@
     "name": "Navi",
     "price": 189000,
     "size": "S, M, L, XL",
-    "photo": "images/navi.jpg",
+    "photo": "Navi.jpg",
     "description": "Официальная джерси NAVI"
   }
 ]
