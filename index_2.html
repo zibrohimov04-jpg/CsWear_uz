@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSWEAR UZ</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root {
+    --bg: #0A1628; --bg2: #0F1E38; --card: #132040;
+    --line: #1E3058; --accent: #4382DF; --accent2: #2E6BCC;
+    --text: #F0F4FF; --hint: #7A9CC8; --success: #3DBE7A; --danger: #E05555;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-height: 100vh; padding-bottom: 70px; overflow-x: hidden; }
+
+  .screen { display: none; animation: fadeIn 0.2s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* NAV */
+  .nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg2); border-top: 1px solid var(--line); display: flex; z-index: 100; }
+  .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0 12px; background: none; border: none; color: var(--hint); font-size: 10px; gap: 4px; cursor: pointer; }
+  .nav-btn.active { color: var(--accent); }
+  .nav-btn svg { width: 22px; height: 22px; }
+  .nav-cart-badge { position: relative; }
+  .badge { position: absolute; top: -4px; right: -6px; background: var(--accent); color: #fff; font-size: 9px; font-weight: 700; border-radius: 999px; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; padding: 0 3px; }
+
+  /* HOME */
+  .hero { background: linear-gradient(160deg, #0F1E38 0%, #0A1628 60%); padding: 36px 20px 28px; text-align: center; border-bottom: 1px solid var(--line); }
+  .hero-logo { font-size: 32px; font-weight: 900; letter-spacing: -1px; }
+  .hero-logo span { color: var(--accent); }
+  .hero-sub { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--hint); margin-top: 4px; }
+  .hero-tagline { margin-top: 16px; font-size: 15px; line-height: 1.5; color: var(--hint); max-width: 260px; margin-left: auto; margin-right: auto; }
+  .hero-btn { margin-top: 20px; display: inline-block; background: var(--accent); color: #fff; font-weight: 700; font-size: 14px; padding: 12px 28px; border-radius: 12px; border: none; cursor: pointer; }
+  .section-title { font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--hint); padding: 20px 16px 10px; }
+  .featured-scroll { display: flex; gap: 10px; padding: 0 16px 4px; overflow-x: auto; scrollbar-width: none; }
+  .featured-scroll::-webkit-scrollbar { display: none; }
+  .featured-card { flex: 0 0 150px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; cursor: pointer; }
+  .featured-card img { width: 100%; height: 160px; object-fit: cover; display: block; }
+  .featured-card-body { padding: 8px 10px 10px; }
+  .featured-card-name { font-size: 12px; font-weight: 600; }
+  .featured-card-price { font-size: 12px; color: var(--accent); font-weight: 700; margin-top: 3px; }
+
+  /* CATALOG */
+  .catalog-header { padding: 18px 16px 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); }
+  .catalog-header h2 { font-size: 20px; font-weight: 700; }
+  .catalog-count { font-size: 12px; color: var(--hint); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
+  .card img { width: 100%; aspect-ratio: 4/5; object-fit: cover; display: block; background: #1a2a45; }
+  .card-body { padding: 10px 10px 12px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .card-name { font-size: 13px; font-weight: 600; line-height: 1.25; }
+  .card-sizes-row { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+  .size-chip { padding: 4px 8px; border-radius: 6px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .size-chip:active { background: var(--accent); color: #fff; transform: scale(0.95); }
+  .card-price { font-size: 14px; font-weight: 700; color: var(--accent); margin-top: auto; padding-top: 6px; }
+
+  /* SIZE MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: none; align-items: flex-end; z-index: 200; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg2); width: 100%; border-radius: 20px 20px 0 0; padding: 20px 20px 32px; }
+  .modal-handle { width: 36px; height: 4px; background: var(--line); border-radius: 2px; margin: 0 auto 18px; }
+  .modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .modal-product-info { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .modal-product-info img { width: 56px; height: 64px; object-fit: cover; border-radius: 10px; background: var(--card); }
+  .modal-product-name { font-size: 14px; font-weight: 600; }
+  .modal-product-price { font-size: 13px; color: var(--accent); font-weight: 700; margin-top: 3px; }
+  .sizes-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .size-btn { padding: 14px 0; border-radius: 12px; border: 1.5px solid var(--line); background: var(--card); color: var(--text); font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+  .size-btn:active { background: var(--accent); border-color: var(--accent); transform: scale(0.95); }
+
+  /* CART */
+  .cart-header { padding: 18px 16px 12px; border-bottom: 1px solid var(--line); }
+  .cart-header h2 { font-size: 20px; font-weight: 700; }
+  .cart-empty { text-align: center; color: var(--hint); padding: 60px 20px; font-size: 14px; }
+  .cart-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .cart-item img { width: 60px; height: 70px; object-fit: cover; border-radius: 8px; background: var(--card); flex-shrink: 0; }
+  .cart-item-info { flex: 1; }
+  .cart-item-name { font-size: 13px; font-weight: 600; }
+  .cart-item-size { font-size: 11px; color: var(--accent); font-weight: 700; margin-top: 2px; }
+  .cart-item-price { font-size: 13px; color: var(--hint); margin-top: 2px; }
+  .cart-item-controls { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+  .qty-btn { width: 28px; height: 28px; border-radius: 8px; background: var(--line); border: none; color: var(--text); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .qty-num { font-size: 14px; font-weight: 600; min-width: 16px; text-align: center; }
+  .cart-remove { background: none; border: none; color: var(--danger); font-size: 12px; cursor: pointer; margin-left: auto; }
+  .cart-footer { position: sticky; bottom: 70px; background: var(--bg2); border-top: 1px solid var(--line); padding: 14px 16px; }
+  .cart-total-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
+  .cart-total-label { font-size: 14px; color: var(--hint); }
+  .cart-total-val { font-size: 18px; font-weight: 700; color: var(--accent); }
+  .primary-btn { width: 100%; padding: 13px; background: var(--accent); color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
+
+  /* CHECKOUT */
+  .checkout-header { padding: 18px 16px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; }
+  .back-btn { background: none; border: none; color: var(--accent); font-size: 14px; cursor: pointer; }
+  .checkout-header h2 { font-size: 18px; font-weight: 700; }
+  .form-section { padding: 16px; }
+  .form-section h3 { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--hint); margin-bottom: 12px; }
+  label { display: block; font-size: 12px; color: var(--hint); margin: 12px 0 5px; }
+  input, textarea { width: 100%; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; color: var(--text); font-size: 14px; font-family: inherit; }
+  input:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  .divider { height: 1px; background: var(--line); margin: 0 16px; }
+
+  /* MAP */
+  .map-section { padding: 16px; }
+  .map-section h3 { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--hint); margin-bottom: 10px; }
+  .map-hint { font-size: 12px; color: var(--hint); margin-bottom: 10px; line-height: 1.5; }
+  #map { width: 100%; height: 280px; border-radius: 14px; border: 1px solid var(--line); overflow: hidden; z-index: 1; }
+  .map-selected { margin-top: 10px; background: var(--card); border: 1px solid var(--success); border-radius: 10px; padding: 10px 12px; font-size: 12px; color: var(--success); display: none; }
+  .map-selected.show { display: block; }
+
+  /* PAYMENT */
+  .payment-header { padding: 18px 16px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; }
+  .payment-icon { font-size: 40px; text-align: center; padding: 20px; }
+  .payment-card { margin: 0 16px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .payment-card-header { background: var(--accent); padding: 12px 16px; font-size: 13px; font-weight: 700; }
+  .payment-card-body { padding: 14px 16px; }
+  .payment-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .payment-row:last-child { border-bottom: none; }
+  .payment-row .plabel { color: var(--hint); }
+  .payment-row .val { font-weight: 600; }
+  .payment-amount { font-size: 24px; font-weight: 800; color: var(--accent); text-align: center; padding: 16px; }
+  .upload-zone { margin: 0 16px 16px; border: 2px dashed var(--line); border-radius: 14px; padding: 24px; text-align: center; cursor: pointer; }
+  .upload-zone.has-file { border-color: var(--success); }
+  .upload-zone p { color: var(--hint); font-size: 13px; margin-top: 8px; }
+  #screenshotInput { display: none; }
+
+  /* SUCCESS */
+  .success-screen { text-align: center; padding: 60px 24px; }
+  .success-icon { font-size: 56px; margin-bottom: 16px; }
+  .success-screen h2 { font-size: 22px; font-weight: 800; margin-bottom: 10px; }
+  .success-screen p { font-size: 14px; color: var(--hint); line-height: 1.6; }
+  .success-screen .primary-btn { margin-top: 28px; }
+
+  /* ORDERS */
+  .orders-header { padding: 18px 16px 12px; border-bottom: 1px solid var(--line); }
+  .orders-header h2 { font-size: 20px; font-weight: 700; }
+  .order-card { margin: 12px 16px 0; background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .order-card-header { padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); }
+  .order-id { font-size: 12px; font-weight: 700; color: var(--accent); }
+  .order-date { font-size: 11px; color: var(--hint); }
+  .order-card-body { padding: 10px 14px; }
+  .order-item-line { font-size: 13px; padding: 4px 0; color: var(--hint); }
+  .order-item-line span { color: var(--text); font-weight: 500; }
+  .order-total { font-size: 14px; font-weight: 700; color: var(--accent); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+  .orders-empty { text-align: center; color: var(--hint); padding: 60px 20px; font-size: 14px; }
+
+  .leaflet-container { background: #0a1628; }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="screen-home" class="screen active">
+  <div class="hero">
+    <div class="hero-logo"><span>CS</span>WEAR UZ</div>
+    <div class="hero-sub">Esports Merch</div>
+    <div class="hero-tagline">Официальные джерси киберспортивных команд мирового уровня</div>
+    <button class="hero-btn" onclick="showScreen('catalog')">Смотреть коллекцию →</button>
+  </div>
+  <div class="section-title">Популярные</div>
+  <div class="featured-scroll" id="featuredScroll"></div>
+  <div style="height:16px"></div>
+</div>
+
+<!-- CATALOG -->
+<div id="screen-catalog" class="screen">
+  <div class="catalog-header">
+    <h2>Коллекция</h2>
+    <span class="catalog-count" id="catalogCount"></span>
+  </div>
+  <div class="grid" id="catalogGrid"></div>
+</div>
+
+<!-- SIZE MODAL -->
+<div class="modal-overlay" id="sizeModal" onclick="closeSizeModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-product-info">
+      <img id="modalImg" src="" alt="">
+      <div>
+        <div class="modal-product-name" id="modalName"></div>
+        <div class="modal-product-price" id="modalPrice"></div>
+      </div>
+    </div>
+    <h3>Выберите размер</h3>
+    <div class="sizes-grid" id="modalSizes"></div>
+  </div>
+</div>
+
+<!-- CART -->
+<div id="screen-cart" class="screen">
+  <div class="cart-header"><h2>Корзина</h2></div>
+  <div id="cartItems"></div>
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="cart-total-row">
+      <span class="cart-total-label">Итого</span>
+      <span class="cart-total-val" id="cartTotalVal"></span>
+    </div>
+    <button class="primary-btn" onclick="showScreen('checkout')">Оформить заказ →</button>
+  </div>
+</div>
+
+<!-- CHECKOUT -->
+<div id="screen-checkout" class="screen">
+  <div class="checkout-header">
+    <button class="back-btn" onclick="showScreen('cart')">← Назад</button>
+    <h2>Оформление</h2>
+  </div>
+  <div class="form-section">
+    <h3>Контакты</h3>
+    <label>Имя</label>
+    <input id="f-name" placeholder="Как к вам обращаться">
+    <label>Телефон</label>
+    <input id="f-phone" placeholder="+998 90 000 00 00" type="tel">
+    <label>Telegram (необязательно)</label>
+    <input id="f-tg" placeholder="@username">
+    <label>Комментарий</label>
+    <textarea id="f-note" rows="2" placeholder="Любые пожелания..."></textarea>
+  </div>
+  <div class="divider"></div>
+  <div class="map-section">
+    <h3>Адрес доставки</h3>
+    <div class="map-hint">📍 Нажмите на карту, чтобы указать точку доставки. Можно перемещать метку.</div>
+    <div id="map"></div>
+    <div class="map-selected" id="mapSelected">✓ Точка доставки выбрана</div>
+  </div>
+  <div style="padding: 0 16px 24px">
+    <button class="primary-btn" onclick="submitOrder()">Перейти к оплате →</button>
+  </div>
+</div>
+
+<!-- PAYMENT -->
+<div id="screen-payment" class="screen">
+  <div class="payment-header">
+    <button class="back-btn" onclick="showScreen('checkout')">← Назад</button>
+    <h2>Оплата</h2>
+  </div>
+  <div class="payment-icon">💳</div>
+  <div class="payment-card">
+    <div class="payment-card-header">CLICK — Перевод на карту</div>
+    <div class="payment-card-body">
+      <div class="payment-row"><span class="plabel">Номер карты</span><span class="val">XXXX XXXX XXXX XXXX</span></div>
+      <div class="payment-row"><span class="plabel">Получатель</span><span class="val">Ваше имя</span></div>
+    </div>
+  </div>
+  <div class="payment-card">
+    <div class="payment-card-header">PAYME — Перевод на карту</div>
+    <div class="payment-card-body">
+      <div class="payment-row"><span class="plabel">Номер карты</span><span class="val">XXXX XXXX XXXX XXXX</span></div>
+      <div class="payment-row"><span class="plabel">Получатель</span><span class="val">Ваше имя</span></div>
+    </div>
+  </div>
+  <div class="payment-amount" id="paymentAmount"></div>
+  <div style="padding: 0 16px 8px; font-size: 13px; color: var(--hint);">После оплаты прикрепите скриншот чека:</div>
+  <div class="upload-zone" id="uploadZone" onclick="document.getElementById('screenshotInput').click()">
+    <div style="font-size:28px">📎</div>
+    <p id="uploadText">Нажмите чтобы прикрепить скриншот</p>
+  </div>
+  <input type="file" id="screenshotInput" accept="image/*">
+  <div style="padding: 0 16px 24px">
+    <button class="primary-btn" onclick="confirmPayment()">Подтвердить оплату ✓</button>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div id="screen-success" class="screen">
+  <div class="success-screen">
+    <div class="success-icon">🎉</div>
+    <h2>Заказ принят!</h2>
+    <p>Мы получили ваш заказ и скриншот оплаты.<br>Свяжемся с вами в ближайшее время.</p>
+    <button class="primary-btn" onclick="goHome()">На главную</button>
+  </div>
+</div>
+
+<!-- ORDERS -->
+<div id="screen-orders" class="screen">
+  <div class="orders-header"><h2>Мои заказы</h2></div>
+  <div id="ordersList"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="nav">
+  <button class="nav-btn active" id="nav-home" onclick="showScreen('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Главная
+  </button>
+  <button class="nav-btn" id="nav-catalog" onclick="showScreen('catalog')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Коллекция
+  </button>
+  <button class="nav-btn" id="nav-cart" onclick="showScreen('cart')">
+    <div class="nav-cart-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+      <span class="badge" id="cartBadge" style="display:none"></span>
+    </div>
+    Корзина
+  </button>
+  <button class="nav-btn" id="nav-orders" onclick="showScreen('orders')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    Заказы
+  </button>
+</nav>
+
+<script>
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+let products = [];
+// cart key = "productId_size", value = { product, size, qty }
+let cart = {};
+let pendingOrder = null;
+let selectedProduct = null;
+let deliveryLocation = null;
+let map = null;
+let marker = null;
+
+// ── ROUTING ──
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  const nb = document.getElementById('nav-' + name);
+  if (nb) nb.classList.add('active');
+  if (name === 'cart') renderCart();
+  if (name === 'orders') renderOrders();
+  if (name === 'checkout') initMap();
+}
+
+function goHome() {
+  cart = {}; pendingOrder = null; deliveryLocation = null;
+  updateCartBadge();
+  showScreen('home');
+}
+
+function money(n) { return Number(n).toLocaleString('ru-RU') + ' сум'; }
+function genId() { return 'CS-' + Date.now().toString(36).toUpperCase(); }
+
+// ── RENDER HOME ──
+function renderHome() {
+  const scroll = document.getElementById('featuredScroll');
+  scroll.innerHTML = products.slice(0, 5).map(p => `
+    <div class="featured-card" onclick="showScreen('catalog')">
+      <img src="${p.photo}" alt="${p.name}" loading="lazy">
+      <div class="featured-card-body">
+        <div class="featured-card-name">${p.name}</div>
+        <div class="featured-card-price">${money(p.price)}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── RENDER CATALOG ──
+function renderCatalog() {
+  document.getElementById('catalogCount').textContent = products.length + ' товаров';
+  document.getElementById('catalogGrid').innerHTML = products.map(p => {
+    const sizes = p.size.split(',').map(s => s.trim());
+    return `<div class="card">
+      <img src="${p.photo}" alt="${p.name}" loading="lazy">
+      <div class="card-body">
+        <div class="card-name">${p.name}</div>
+        <div class="card-price">${money(p.price)}</div>
+        <div class="card-sizes-row">
+          ${sizes.map(s => `<button class="size-chip" onclick="openSizeModal(${p.id}, '${s}')">${s}</button>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── SIZE MODAL ──
+function openSizeModal(productId, preselectedSize) {
+  selectedProduct = products.find(p => p.id == productId);
+  if (!selectedProduct) return;
+  document.getElementById('modalImg').src = selectedProduct.photo;
+  document.getElementById('modalName').textContent = selectedProduct.name;
+  document.getElementById('modalPrice').textContent = money(selectedProduct.price);
+  const sizes = selectedProduct.size.split(',').map(s => s.trim());
+  document.getElementById('modalSizes').innerHTML = sizes.map(s => `
+    <button class="size-btn" onclick="addToCartWithSize('${s}')">${s}</button>`).join('');
+  document.getElementById('sizeModal').classList.add('open');
+}
+
+function closeSizeModal(e) {
+  if (e.target === document.getElementById('sizeModal')) {
+    document.getElementById('sizeModal').classList.remove('open');
+  }
+}
+
+function addToCartWithSize(size) {
+  const key = selectedProduct.id + '_' + size;
+  if (cart[key]) {
+    cart[key].qty += 1;
+  } else {
+    cart[key] = { product: selectedProduct, size, qty: 1 };
+  }
+  document.getElementById('sizeModal').classList.remove('open');
+  updateCartBadge();
+  renderCatalog();
+}
+
+function updateCartBadge() {
+  const total = Object.values(cart).reduce((s, v) => s + v.qty, 0);
+  const badge = document.getElementById('cartBadge');
+  if (total > 0) { badge.style.display = 'flex'; badge.textContent = total; }
+  else badge.style.display = 'none';
+}
+
+// ── CART ──
+function renderCart() {
+  const keys = Object.keys(cart);
+  const container = document.getElementById('cartItems');
+  const footer = document.getElementById('cartFooter');
+  if (keys.length === 0) {
+    container.innerHTML = '<div class="cart-empty">Корзина пуста.<br>Добавьте товары из коллекции.</div>';
+    footer.style.display = 'none'; return;
+  }
+  container.innerHTML = keys.map(key => {
+    const { product: p, size, qty } = cart[key];
+    return `<div class="cart-item">
+      <img src="${p.photo}" alt="${p.name}">
+      <div class="cart-item-info">
+        <div class="cart-item-name">${p.name}</div>
+        <div class="cart-item-size">Размер: ${size}</div>
+        <div class="cart-item-price">${money(p.price * qty)}</div>
+        <div class="cart-item-controls">
+          <button class="qty-btn" onclick="changeQty('${key}', -1)">−</button>
+          <span class="qty-num">${qty}</span>
+          <button class="qty-btn" onclick="changeQty('${key}', 1)">+</button>
+          <button class="cart-remove" onclick="removeItem('${key}')">Убрать</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  const total = Object.values(cart).reduce((s, {product: p, qty}) => s + p.price * qty, 0);
+  document.getElementById('cartTotalVal').textContent = money(total);
+  footer.style.display = 'block';
+}
+
+function changeQty(key, delta) {
+  if (!cart[key]) return;
+  cart[key].qty += delta;
+  if (cart[key].qty <= 0) delete cart[key];
+  updateCartBadge(); renderCart();
+}
+
+function removeItem(key) {
+  delete cart[key];
+  updateCartBadge(); renderCart();
+}
+
+// ── MAP ──
+function initMap() {
+  if (map) return; // already initialized
+  setTimeout(() => {
+    map = L.map('map', { zoomControl: true }).setView([41.2995, 69.2401], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    const pinIcon = L.divIcon({
+      html: '<div style="font-size:32px;margin-top:-32px;margin-left:-12px">📍</div>',
+      iconSize: [24, 32], iconAnchor: [12, 32], className: ''
+    });
+
+    map.on('click', function(e) {
+      deliveryLocation = e.latlng;
+      if (marker) marker.setLatLng(e.latlng);
+      else marker = L.marker(e.latlng, { icon: pinIcon, draggable: true }).addTo(map);
+      marker.on('dragend', function() {
+        deliveryLocation = marker.getLatLng();
+      });
+      document.getElementById('mapSelected').classList.add('show');
+    });
+  }, 100);
+}
+
+// ── CHECKOUT ──
+function submitOrder() {
+  const name = document.getElementById('f-name').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const tgUser = document.getElementById('f-tg').value.trim();
+  const note = document.getElementById('f-note').value.trim();
+  if (!name || !phone) { alert('Укажите имя и телефон'); return; }
+  if (!deliveryLocation) { alert('Укажите точку доставки на карте'); return; }
+
+  const items = Object.values(cart).map(({ product: p, size, qty }) => ({
+    name: p.name, size, qty, price: p.price, sum: p.price * qty
+  }));
+  const total = items.reduce((s, i) => s + i.sum, 0);
+
+  pendingOrder = {
+    id: genId(),
+    name, phone, tgUser, note,
+    location: { lat: deliveryLocation.lat.toFixed(6), lng: deliveryLocation.lng.toFixed(6) },
+    mapLink: `https://www.openstreetmap.org/?mlat=${deliveryLocation.lat.toFixed(6)}&mlon=${deliveryLocation.lng.toFixed(6)}&zoom=17`,
+    items, total,
+    date: new Date().toISOString()
+  };
+  document.getElementById('paymentAmount').textContent = money(total);
+  showScreen('payment');
+}
+
+// ── PAYMENT ──
+document.getElementById('screenshotInput').addEventListener('change', function() {
+  if (this.files[0]) {
+    document.getElementById('uploadZone').classList.add('has-file');
+    document.getElementById('uploadText').textContent = '✓ ' + this.files[0].name;
+  }
+});
+
+function confirmPayment() {
+  if (!document.getElementById('screenshotInput').files[0]) {
+    alert('Прикрепите скриншот оплаты'); return;
+  }
+  const orders = JSON.parse(localStorage.getItem('csw_orders') || '[]');
+  orders.unshift(pendingOrder);
+  localStorage.setItem('csw_orders', JSON.stringify(orders));
+
+  if (tg && tg.sendData) {
+    tg.sendData(JSON.stringify({ ...pendingOrder, paymentConfirmed: true }));
+  }
+  showScreen('success');
+}
+
+// ── ORDERS ──
+function renderOrders() {
+  const orders = JSON.parse(localStorage.getItem('csw_orders') || '[]');
+  const container = document.getElementById('ordersList');
+  if (orders.length === 0) {
+    container.innerHTML = '<div class="orders-empty">У вас пока нет заказов.</div>'; return;
+  }
+  container.innerHTML = orders.map(o => {
+    const date = new Date(o.date).toLocaleDateString('ru-RU', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    const itemsHtml = o.items.map(i =>
+      `<div class="order-item-line"><span>${i.name} (${i.size})</span> × ${i.qty} — ${money(i.sum)}</div>`
+    ).join('');
+    return `<div class="order-card">
+      <div class="order-card-header">
+        <span class="order-id">${o.id}</span>
+        <span class="order-date">${date}</span>
+      </div>
+      <div class="order-card-body">${itemsHtml}
+        <div class="order-total">Итого: ${money(o.total)}</div>
+      </div>
+    </div>`;
+  }).join('') + '<div style="height:16px"></div>';
+}
+
+// ── INIT ──
+fetch('products.json')
+  .then(r => r.json())
+  .then(data => { products = data; renderHome(); renderCatalog(); });
+</script>
+</body>
+</html>
