@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSWEAR UZ</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root{--bg:#0A1628;--bg2:#0F1E38;--card:#132040;--line:#1E3058;--accent:#4382DF;--text:#F0F4FF;--hint:#7A9CC8;--success:#3DBE7A;--danger:#E05555;}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;padding-bottom:70px;overflow-x:hidden;}
+  .screen{display:none;animation:fadeIn .2s ease;}.screen.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* NAV */
+  .nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--line);display:flex;z-index:100;}
+  .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 12px;background:none;border:none;color:var(--hint);font-size:10px;gap:4px;cursor:pointer;}
+  .nav-btn.active{color:var(--accent);}
+  .nav-btn svg{width:22px;height:22px;}
+  .nav-cart-wrap{position:relative;}
+  .badge{position:absolute;top:-4px;right:-6px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;border-radius:999px;min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+
+  /* PAGE HEADER */
+  .page-hd{padding:18px 16px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);}
+  .page-hd h2{font-size:20px;font-weight:700;}
+  .page-sub{font-size:12px;color:var(--hint);}
+  .back-row{padding:14px 16px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;}
+  .back-btn{background:none;border:none;color:var(--accent);font-size:14px;cursor:pointer;}
+  .back-row h2{font-size:18px;font-weight:700;}
+
+  /* HOME */
+  .hero{background:linear-gradient(160deg,#0F1E38 0%,#0A1628 60%);padding:36px 20px 28px;text-align:center;border-bottom:1px solid var(--line);}
+  .hero-logo{font-size:32px;font-weight:900;letter-spacing:-1px;}.hero-logo span{color:var(--accent);}
+  .hero-sub{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--hint);margin-top:4px;}
+  .hero-tagline{margin-top:16px;font-size:15px;line-height:1.5;color:var(--hint);max-width:260px;margin-left:auto;margin-right:auto;}
+  .hero-btn{margin-top:20px;display:inline-block;background:var(--accent);color:#fff;font-weight:700;font-size:14px;padding:12px 28px;border-radius:12px;border:none;cursor:pointer;}
+  .section-title{font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--hint);padding:20px 16px 10px;}
+  .featured-scroll{display:flex;gap:10px;padding:0 16px 4px;overflow-x:auto;scrollbar-width:none;}
+  .featured-scroll::-webkit-scrollbar{display:none;}
+  .featured-card{flex:0 0 150px;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;}
+  .featured-card img{width:100%;height:160px;object-fit:cover;display:block;}
+  .featured-card-body{padding:8px 10px 10px;}
+  .fc-name{font-size:12px;font-weight:600;}.fc-price{font-size:12px;color:var(--accent);font-weight:700;margin-top:3px;}
+
+  /* CATALOG */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;}
+  .card img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:#1a2a45;}
+  .card-body{padding:10px 10px 12px;display:flex;flex-direction:column;gap:4px;flex:1;}
+  .card-name{font-size:13px;font-weight:600;line-height:1.25;}
+  .card-price{font-size:14px;font-weight:700;color:var(--accent);margin-top:2px;}
+  .sizes-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+  .size-chip{padding:4px 9px;border-radius:7px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-size:11px;font-weight:700;cursor:pointer;}
+  .size-chip:active{background:var(--accent);color:#fff;}
+
+  /* SIZE MODAL */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:flex-end;z-index:200;}
+  .overlay.open{display:flex;}
+  .modal{background:var(--bg2);width:100%;border-radius:20px 20px 0 0;padding:20px 20px 36px;}
+  .modal-handle{width:36px;height:4px;background:var(--line);border-radius:2px;margin:0 auto 18px;}
+  .modal-row{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+  .modal-row img{width:56px;height:64px;object-fit:cover;border-radius:10px;background:var(--card);}
+  .modal-pname{font-size:14px;font-weight:700;}.modal-pprice{font-size:13px;color:var(--accent);font-weight:700;margin-top:3px;}
+  .modal-label{font-size:11px;color:var(--hint);margin-bottom:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+  .size-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+  .size-opt{padding:14px 0;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;text-align:center;}
+  .size-opt:active{background:var(--accent);border-color:var(--accent);}
+
+  /* CART */
+  .empty-msg{text-align:center;color:var(--hint);padding:60px 20px;font-size:14px;}
+  .cart-item{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-bottom:1px solid var(--line);}
+  .cart-item img{width:60px;height:70px;object-fit:cover;border-radius:8px;background:var(--card);flex-shrink:0;}
+  .ci-name{font-size:13px;font-weight:600;}.ci-size{font-size:11px;color:var(--accent);font-weight:700;margin-top:2px;}
+  .ci-price{font-size:13px;color:var(--hint);margin-top:2px;}
+  .ci-controls{display:flex;align-items:center;gap:10px;margin-top:8px;}
+  .qty-btn{width:28px;height:28px;border-radius:8px;background:var(--line);border:none;color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .qty-num{font-size:14px;font-weight:600;min-width:16px;text-align:center;}
+  .ci-remove{background:none;border:none;color:var(--danger);font-size:12px;cursor:pointer;margin-left:auto;}
+  .cart-footer{position:sticky;bottom:70px;background:var(--bg2);border-top:1px solid var(--line);padding:14px 16px;}
+  .total-row{display:flex;justify-content:space-between;margin-bottom:12px;}
+  .total-label{font-size:14px;color:var(--hint);}.total-val{font-size:18px;font-weight:700;color:var(--accent);}
+  .primary-btn{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;}
+
+  /* FORM */
+  .form-section{padding:16px;}
+  .form-section h3{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--hint);margin-bottom:12px;}
+  label{display:block;font-size:12px;color:var(--hint);margin:12px 0 5px;}
+  input,textarea{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text);font-size:14px;font-family:inherit;}
+  input:focus,textarea:focus{outline:none;border-color:var(--accent);}
+  .divider{height:1px;background:var(--line);margin:0 16px;}
+  .info-banner{margin:0 16px 14px;background:rgba(67,130,223,.1);border:1px solid rgba(67,130,223,.25);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--accent);line-height:1.5;}
+
+  /* MAP */
+  .map-hint{font-size:12px;color:var(--hint);margin-bottom:10px;line-height:1.5;}
+  #map{width:100%;height:260px;border-radius:14px;border:1px solid var(--line);overflow:hidden;}
+  .map-ok{margin-top:8px;background:var(--card);border:1px solid var(--success);border-radius:10px;padding:9px 12px;font-size:12px;color:var(--success);display:none;}
+  .map-ok.show{display:block;}
+
+  /* PAYMENT */
+  .pay-icon{font-size:40px;text-align:center;padding:20px 0 10px;}
+  .pay-card{margin:0 16px 14px;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  .pay-card-hd{background:var(--accent);padding:12px 16px;font-size:13px;font-weight:700;}
+  .pay-card-bd{padding:14px 16px;}
+  .pay-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;}
+  .pay-row:last-child{border-bottom:none;}
+  .pay-row .pl{color:var(--hint);}.pay-row .pv{font-weight:600;}
+  .pay-amount{font-size:26px;font-weight:800;color:var(--accent);text-align:center;padding:16px;}
+  .upload-zone{margin:0 16px 16px;border:2px dashed var(--line);border-radius:14px;padding:22px;text-align:center;cursor:pointer;}
+  .upload-zone.ok{border-color:var(--success);}
+  .uz-icon{font-size:28px;}
+  .upload-zone p{color:var(--hint);font-size:13px;margin-top:8px;}
+  #screenshotInput{display:none;}
+
+  /* SENDING */
+  .sending-overlay{position:fixed;inset:0;background:rgba(10,22,40,.85);display:none;align-items:center;justify-content:center;z-index:300;flex-direction:column;gap:14px;}
+  .sending-overlay.show{display:flex;}
+  .spinner{width:40px;height:40px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .sending-text{font-size:14px;color:var(--hint);}
+
+  /* SUCCESS */
+  .success-wrap{text-align:center;padding:50px 24px;}
+  .s-icon{font-size:60px;margin-bottom:16px;}
+  .success-wrap h2{font-size:22px;font-weight:800;margin-bottom:10px;}
+  .success-wrap p{font-size:14px;color:var(--hint);line-height:1.6;}
+  .btn-outline{width:100%;padding:13px;background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-top:10px;}
+
+  /* ORDERS LIST */
+  .refresh-btn{background:none;border:1px solid var(--line);color:var(--hint);padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;}
+  .order-card{margin:12px 16px 0;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer;transition:border-color .15s;}
+  .order-card:active{border-color:var(--accent);}
+  .order-card-hd{padding:12px 14px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--line);}
+  .order-id{font-size:12px;font-weight:700;color:var(--accent);}
+  .order-date{font-size:11px;color:var(--hint);}
+  .order-card-bd{padding:10px 14px 14px;}
+  .order-summary{font-size:13px;color:var(--hint);margin-bottom:8px;}
+  .order-summary span{color:var(--text);font-weight:500;}
+  .order-total{font-size:14px;font-weight:700;color:var(--accent);}
+  .status-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-top:8px;}
+  .status-pill.pending{background:rgba(240,165,0,.12);color:#F0A500;border:1px solid rgba(240,165,0,.3);}
+  .status-pill.confirmed{background:rgba(67,130,223,.12);color:var(--accent);border:1px solid rgba(67,130,223,.3);}
+  .status-pill.shipped{background:rgba(130,100,220,.12);color:#8264DC;border:1px solid rgba(130,100,220,.3);}
+  .status-pill.in_tashkent{background:rgba(61,190,122,.12);color:var(--success);border:1px solid rgba(61,190,122,.3);}
+  .status-pill.delivered{background:rgba(61,190,122,.2);color:var(--success);border:1px solid var(--success);}
+
+  /* ORDER DETAIL MODAL */
+  .detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;z-index:250;}
+  .detail-overlay.open{display:flex;}
+  .detail-modal{background:var(--bg2);width:100%;border-radius:20px 20px 0 0;max-height:85vh;overflow-y:auto;padding:20px 0 36px;}
+  .detail-handle{width:36px;height:4px;background:var(--line);border-radius:2px;margin:0 auto 16px;}
+  .detail-hd{padding:0 18px 14px;border-bottom:1px solid var(--line);}
+  .detail-order-id{font-size:18px;font-weight:800;color:var(--accent);}
+  .detail-date{font-size:12px;color:var(--hint);margin-top:3px;}
+
+  /* TIMELINE */
+  .timeline{padding:18px 18px 0;}
+  .tl-section-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--hint);margin-bottom:14px;}
+  .tl-item{display:flex;gap:14px;padding-bottom:0;}
+  .tl-left{display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0;}
+  .tl-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+  .tl-dot.done{background:var(--success);}
+  .tl-dot.active{background:var(--accent);box-shadow:0 0 0 5px rgba(67,130,223,.2);}
+  .tl-dot.future{background:var(--card);border:2px solid var(--line);}
+  .tl-connector{width:2px;flex:1;min-height:20px;margin:3px 0;}
+  .tl-connector.done{background:var(--success);}
+  .tl-connector.future{background:var(--line);}
+  .tl-content{flex:1;padding-bottom:20px;}
+  .tl-label{font-size:14px;font-weight:600;line-height:1.3;}
+  .tl-label.done{color:var(--success);}
+  .tl-label.active{color:var(--accent);}
+  .tl-label.future{color:var(--hint);}
+  .tl-time{font-size:11px;color:var(--hint);margin-top:4px;}
+  .tl-time.done{color:rgba(61,190,122,.7);}
+
+  /* DETAIL ITEMS */
+  .detail-items{padding:16px 18px 0;}
+  .detail-item-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;}
+  .detail-item-row:last-child{border-bottom:none;}
+  .detail-item-name{color:var(--text);font-weight:500;}
+  .detail-item-price{color:var(--accent);font-weight:700;}
+  .detail-total{padding:12px 18px;font-size:16px;font-weight:800;color:var(--accent);border-top:1px solid var(--line);}
+  .detail-map-btn{display:block;margin:0 18px 4px;padding:11px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--accent);font-size:13px;font-weight:600;text-align:center;text-decoration:none;}
+
+  .leaflet-container{background:var(--bg);}
+</style>
+</head>
+<body>
+
+<div class="sending-overlay" id="sendingOverlay">
+  <div class="spinner"></div>
+  <div class="sending-text">Отправляем заказ...</div>
+</div>
+
+<!-- HOME -->
+<div id="screen-home" class="screen active">
+  <div class="hero">
+    <div class="hero-logo"><span>CS</span>WEAR UZ</div>
+    <div class="hero-sub">Esports Merch</div>
+    <div class="hero-tagline">Официальные джерси киберспортивных команд мирового уровня</div>
+    <button class="hero-btn" onclick="showScreen('catalog')">Смотреть коллекцию →</button>
+  </div>
+  <div class="section-title">Популярные</div>
+  <div class="featured-scroll" id="featuredScroll"></div>
+  <div style="height:16px"></div>
+</div>
+
+<!-- CATALOG -->
+<div id="screen-catalog" class="screen">
+  <div class="page-hd"><h2>Коллекция</h2><span class="page-sub" id="catalogCount"></span></div>
+  <div class="grid" id="catalogGrid"></div>
+</div>
+
+<!-- SIZE MODAL -->
+<div class="overlay" id="sizeOverlay" onclick="closeSizeModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-row">
+      <img id="mImg" src="" alt="">
+      <div><div class="modal-pname" id="mName"></div><div class="modal-pprice" id="mPrice"></div></div>
+    </div>
+    <div class="modal-label">Выберите размер</div>
+    <div class="size-grid" id="mSizes"></div>
+  </div>
+</div>
+
+<!-- CART -->
+<div id="screen-cart" class="screen">
+  <div class="page-hd"><h2>Корзина</h2></div>
+  <div id="cartItems"></div>
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="total-row"><span class="total-label">Итого</span><span class="total-val" id="cartTotalVal"></span></div>
+    <button class="primary-btn" onclick="showScreen('checkout')">Оформить заказ →</button>
+  </div>
+</div>
+
+<!-- CHECKOUT -->
+<div id="screen-checkout" class="screen">
+  <div class="back-row"><button class="back-btn" onclick="showScreen('cart')">← Назад</button><h2>Оформление</h2></div>
+  <div class="form-section">
+    <h3>Контакты</h3>
+    <label>Имя</label><input id="f-name" placeholder="Как к вам обращаться">
+    <label>Телефон</label><input id="f-phone" placeholder="+998 90 000 00 00" type="tel">
+    <label>Telegram (необязательно)</label><input id="f-tg" placeholder="@username">
+    <label>Комментарий</label><textarea id="f-note" rows="2" placeholder="Любые пожелания..."></textarea>
+  </div>
+  <div class="divider"></div>
+  <div class="form-section">
+    <h3>Адрес доставки</h3>
+    <div class="map-hint">📍 Нажмите на карту, чтобы поставить метку. Метку можно перетаскивать.</div>
+    <div id="map"></div>
+    <div class="map-ok" id="mapOk">✓ Точка доставки выбрана</div>
+  </div>
+  <div class="info-banner" style="margin-top:14px">📦 Срок доставки по Ташкенту: <b>7–14 дней</b> с момента подтверждения оплаты.</div>
+  <div style="padding:14px 16px 24px">
+    <button class="primary-btn" onclick="submitOrder()">Перейти к оплате →</button>
+  </div>
+</div>
+
+<!-- PAYMENT -->
+<div id="screen-payment" class="screen">
+  <div class="back-row"><button class="back-btn" onclick="showScreen('checkout')">← Назад</button><h2>Оплата</h2></div>
+  <div class="pay-icon">💳</div>
+  <div class="pay-card">
+    <div class="pay-card-hd">CLICK — Перевод на карту</div>
+    <div class="pay-card-bd">
+      <div class="pay-row"><span class="pl">Номер карты</span><span class="pv" id="clickCard">XXXX XXXX XXXX XXXX</span></div>
+      <div class="pay-row"><span class="pl">Получатель</span><span class="pv" id="clickName">Ваше имя</span></div>
+    </div>
+  </div>
+  <div class="pay-card">
+    <div class="pay-card-hd">PAYME — Перевод на карту</div>
+    <div class="pay-card-bd">
+      <div class="pay-row"><span class="pl">Номер карты</span><span class="pv" id="paymeCard">XXXX XXXX XXXX XXXX</span></div>
+      <div class="pay-row"><span class="pl">Получатель</span><span class="pv" id="paymeName">Ваше имя</span></div>
+    </div>
+  </div>
+  <div class="pay-amount" id="payAmount"></div>
+  <div style="padding:0 16px 8px;font-size:13px;color:var(--hint);">После оплаты прикрепите скриншот чека:</div>
+  <div class="upload-zone" id="uploadZone" onclick="document.getElementById('screenshotInput').click()">
+    <div class="uz-icon">📎</div><p id="uploadText">Нажмите чтобы прикрепить скриншот</p>
+  </div>
+  <input type="file" id="screenshotInput" accept="image/*">
+  <div style="padding:0 16px 24px"><button class="primary-btn" onclick="confirmPayment()">Подтвердить оплату ✓</button></div>
+</div>
+
+<!-- SUCCESS -->
+<div id="screen-success" class="screen">
+  <div class="success-wrap">
+    <div class="s-icon">🎉</div>
+    <h2>Заказ принят!</h2>
+    <p>Скриншот оплаты получен. После проверки статус изменится в разделе <b>«Заказы»</b>.<br><br>⏳ Срок доставки по Ташкенту: <b style="color:var(--accent)">7–14 дней</b> с момента подтверждения оплаты.</p>
+    <button class="primary-btn" style="margin-top:24px" onclick="goHome()">На главную</button>
+    <button class="btn-outline" onclick="showScreen('orders')">Мои заказы →</button>
+  </div>
+</div>
+
+<!-- ORDERS -->
+<div id="screen-orders" class="screen">
+  <div class="page-hd"><h2>Мои заказы</h2><button class="refresh-btn" onclick="renderOrders()">↻ Обновить</button></div>
+  <div id="ordersList"></div>
+</div>
+
+<!-- ORDER DETAIL -->
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)">
+  <div class="detail-modal" id="detailModal">
+    <div class="detail-handle"></div>
+    <div class="detail-hd">
+      <div class="detail-order-id" id="dOrderId"></div>
+      <div class="detail-date" id="dDate"></div>
+    </div>
+    <div class="timeline" id="dTimeline"></div>
+    <div class="detail-items" id="dItems"></div>
+    <div class="detail-total" id="dTotal"></div>
+    <a class="detail-map-btn" id="dMapBtn" href="#" target="_blank" style="display:none">📍 Открыть точку доставки на карте</a>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn active" id="nav-home" onclick="showScreen('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Главная
+  </button>
+  <button class="nav-btn" id="nav-catalog" onclick="showScreen('catalog')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Коллекция
+  </button>
+  <button class="nav-btn" id="nav-cart" onclick="showScreen('cart')">
+    <div class="nav-cart-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+      <span class="badge" id="cartBadge" style="display:none"></span>
+    </div>Корзина
+  </button>
+  <button class="nav-btn" id="nav-orders" onclick="showScreen('orders')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Заказы
+  </button>
+</nav>
+
+<script>
+// ━━━ CONFIG ━━━
+const BACKEND_URL = 'REPLACE_WITH_RAILWAY_URL';
+const CLICK_CARD  = 'XXXX XXXX XXXX XXXX';
+const CLICK_NAME  = 'Ваше имя';
+const PAYME_CARD  = 'XXXX XXXX XXXX XXXX';
+const PAYME_NAME  = 'Ваше имя';
+
+document.getElementById('clickCard').textContent = CLICK_CARD;
+document.getElementById('clickName').textContent = CLICK_NAME;
+document.getElementById('paymeCard').textContent = PAYME_CARD;
+document.getElementById('paymeName').textContent = PAYME_NAME;
+
+// ━━━ STATUS CONFIG ━━━
+const STATUS_CONFIG = {
+  pending:     { label: 'Заказ получен',       emoji: '📋' },
+  confirmed:   { label: 'Оплата подтверждена', emoji: '✅' },
+  shipped:     { label: 'Отправлен',           emoji: '📦' },
+  in_tashkent: { label: 'В Ташкенте',          emoji: '🏙' },
+  delivered:   { label: 'Доставлен',           emoji: '🎉' }
+};
+const STATUS_FLOW = ['pending', 'confirmed', 'shipped', 'in_tashkent', 'delivered'];
+
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+const USER_ID = tg?.initDataUnsafe?.user?.id
+  || localStorage.getItem('csw_uid')
+  || (() => { const id = 'u' + Date.now(); localStorage.setItem('csw_uid', id); return id; })();
+
+let products = [], cart = {}, selectedProduct = null, deliveryLocation = null, pendingOrder = null, map = null, marker = null;
+
+// ━━━ ROUTING ━━━
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  const nb = document.getElementById('nav-' + name);
+  if (nb) nb.classList.add('active');
+  if (name === 'cart') renderCart();
+  if (name === 'orders') renderOrders();
+  if (name === 'checkout') initMap();
+}
+function goHome() { cart = {}; pendingOrder = null; deliveryLocation = null; updateBadge(); showScreen('home'); }
+function money(n) { return Number(n).toLocaleString('ru-RU') + ' сум'; }
+function genId() { return 'CS-' + Date.now().toString(36).toUpperCase().slice(-6); }
+function fmtTime(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('ru-RU', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+// ━━━ HOME ━━━
+function renderHome() {
+  document.getElementById('featuredScroll').innerHTML = products.slice(0,5).map(p =>
+    `<div class="featured-card" onclick="showScreen('catalog')">
+      <img src="${p.photo}" alt="${p.name}" loading="lazy">
+      <div class="featured-card-body"><div class="fc-name">${p.name}</div><div class="fc-price">${money(p.price)}</div></div>
+    </div>`).join('');
+}
+
+// ━━━ CATALOG ━━━
+function renderCatalog() {
+  document.getElementById('catalogCount').textContent = products.length + ' товаров';
+  document.getElementById('catalogGrid').innerHTML = products.map(p => {
+    const sizes = p.size.split(',').map(s => s.trim());
+    return `<div class="card">
+      <img src="${p.photo}" alt="${p.name}" loading="lazy">
+      <div class="card-body">
+        <div class="card-name">${p.name}</div>
+        <div class="card-price">${money(p.price)}</div>
+        <div class="sizes-row">${sizes.map(s => `<button class="size-chip" onclick="openModal(${p.id},'${s}')">${s}</button>`).join('')}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ━━━ SIZE MODAL ━━━
+function openModal(pid, size) {
+  selectedProduct = products.find(p => p.id == pid);
+  if (!selectedProduct) return;
+  document.getElementById('mImg').src = selectedProduct.photo;
+  document.getElementById('mName').textContent = selectedProduct.name;
+  document.getElementById('mPrice').textContent = money(selectedProduct.price);
+  const sizes = selectedProduct.size.split(',').map(s => s.trim());
+  document.getElementById('mSizes').innerHTML = sizes.map(s =>
+    `<button class="size-opt" onclick="addToCart('${s}')">${s}</button>`).join('');
+  document.getElementById('sizeOverlay').classList.add('open');
+}
+function closeSizeModal(e) { if (e.target === document.getElementById('sizeOverlay')) document.getElementById('sizeOverlay').classList.remove('open'); }
+function addToCart(size) {
+  const key = selectedProduct.id + '_' + size;
+  cart[key] = cart[key] ? { ...cart[key], qty: cart[key].qty + 1 } : { product: selectedProduct, size, qty: 1 };
+  document.getElementById('sizeOverlay').classList.remove('open');
+  updateBadge(); renderCatalog();
+}
+function updateBadge() {
+  const t = Object.values(cart).reduce((s,v) => s + v.qty, 0);
+  const b = document.getElementById('cartBadge');
+  if (t > 0) { b.style.display = 'flex'; b.textContent = t; } else b.style.display = 'none';
+}
+
+// ━━━ CART ━━━
+function renderCart() {
+  const keys = Object.keys(cart);
+  const container = document.getElementById('cartItems');
+  const footer = document.getElementById('cartFooter');
+  if (!keys.length) { container.innerHTML = '<div class="empty-msg">Корзина пуста.<br>Добавьте товары из коллекции.</div>'; footer.style.display = 'none'; return; }
+  container.innerHTML = keys.map(key => {
+    const {product:p, size, qty} = cart[key];
+    return `<div class="cart-item">
+      <img src="${p.photo}" alt="${p.name}">
+      <div style="flex:1">
+        <div class="ci-name">${p.name}</div>
+        <div class="ci-size">Размер: ${size}</div>
+        <div class="ci-price">${money(p.price * qty)}</div>
+        <div class="ci-controls">
+          <button class="qty-btn" onclick="chQty('${key}',-1)">−</button>
+          <span class="qty-num">${qty}</span>
+          <button class="qty-btn" onclick="chQty('${key}',1)">+</button>
+          <button class="ci-remove" onclick="rmItem('${key}')">Убрать</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  const total = Object.values(cart).reduce((s,{product:p,qty}) => s + p.price * qty, 0);
+  document.getElementById('cartTotalVal').textContent = money(total);
+  footer.style.display = 'block';
+}
+function chQty(key, d) { if (!cart[key]) return; cart[key].qty += d; if (cart[key].qty <= 0) delete cart[key]; updateBadge(); renderCart(); }
+function rmItem(key) { delete cart[key]; updateBadge(); renderCart(); }
+
+// ━━━ MAP ━━━
+function initMap() {
+  if (map) return;
+  setTimeout(() => {
+    map = L.map('map').setView([41.2995, 69.2401], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OSM' }).addTo(map);
+    const icon = L.divIcon({ html:'<div style="font-size:32px;margin-top:-32px;margin-left:-12px">📍</div>', iconSize:[24,32], iconAnchor:[12,32], className:'' });
+    map.on('click', e => {
+      deliveryLocation = e.latlng;
+      if (marker) marker.setLatLng(e.latlng);
+      else { marker = L.marker(e.latlng, {icon, draggable:true}).addTo(map); marker.on('dragend', () => { deliveryLocation = marker.getLatLng(); }); }
+      document.getElementById('mapOk').classList.add('show');
+    });
+  }, 100);
+}
+
+// ━━━ CHECKOUT ━━━
+function submitOrder() {
+  const name = document.getElementById('f-name').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const tgUser = document.getElementById('f-tg').value.trim();
+  const note = document.getElementById('f-note').value.trim();
+  if (!name || !phone) { alert('Укажите имя и телефон'); return; }
+  if (!deliveryLocation) { alert('Укажите точку доставки на карте'); return; }
+  const items = Object.values(cart).map(({product:p, size, qty}) => ({ name:p.name, size, qty, price:p.price, sum:p.price*qty }));
+  const total = items.reduce((s,i) => s + i.sum, 0);
+  pendingOrder = {
+    id: genId(), userId: String(USER_ID), name, phone, tgUser, note, items, total,
+    location: { lat: deliveryLocation.lat.toFixed(6), lng: deliveryLocation.lng.toFixed(6) },
+    mapLink: `https://www.openstreetmap.org/?mlat=${deliveryLocation.lat.toFixed(6)}&mlon=${deliveryLocation.lng.toFixed(6)}&zoom=17`,
+    date: new Date().toISOString()
+  };
+  document.getElementById('payAmount').textContent = money(total);
+  showScreen('payment');
+}
+
+document.getElementById('screenshotInput').addEventListener('change', function() {
+  if (this.files[0]) { document.getElementById('uploadZone').classList.add('ok'); document.getElementById('uploadText').textContent = '✓ ' + this.files[0].name; }
+});
+
+async function confirmPayment() {
+  const file = document.getElementById('screenshotInput').files[0];
+  if (!file) { alert('Прикрепите скриншот оплаты'); return; }
+  document.getElementById('sendingOverlay').classList.add('show');
+  try {
+    const fd = new FormData();
+    fd.append('orderData', JSON.stringify(pendingOrder));
+    fd.append('screenshot', file);
+    const res = await fetch(BACKEND_URL + '/order', { method:'POST', body:fd });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'Server error');
+    const saved = JSON.parse(localStorage.getItem('csw_orders') || '[]');
+    saved.unshift({ ...pendingOrder, status:'pending', timeline:[{ status:'pending', label:'Заказ получен', time: pendingOrder.date }] });
+    localStorage.setItem('csw_orders', JSON.stringify(saved));
+    document.getElementById('sendingOverlay').classList.remove('show');
+    showScreen('success');
+  } catch (e) {
+    document.getElementById('sendingOverlay').classList.remove('show');
+    alert('Ошибка: ' + e.message);
+  }
+}
+
+// ━━━ ORDERS ━━━
+async function renderOrders() {
+  const container = document.getElementById('ordersList');
+  container.innerHTML = '<div class="empty-msg" style="padding:30px">Загрузка...</div>';
+  let ordersList = [];
+  try {
+    const res = await fetch(BACKEND_URL + '/orders/' + USER_ID);
+    ordersList = await res.json();
+    localStorage.setItem('csw_orders', JSON.stringify(ordersList));
+  } catch (e) {
+    ordersList = JSON.parse(localStorage.getItem('csw_orders') || '[]');
+  }
+  if (!ordersList.length) { container.innerHTML = '<div class="empty-msg">У вас пока нет заказов.</div>'; return; }
+
+  container.innerHTML = ordersList.map(o => {
+    const cfg = STATUS_CONFIG[o.status] || STATUS_CONFIG.pending;
+    const pill = `<span class="status-pill ${o.status}">${cfg.emoji} ${cfg.label}</span>`;
+    const itemsPreview = o.items.map(i => `<span>${i.name} [${i.size}]</span>`).join(', ');
+    return `<div class="order-card" onclick="openDetail('${o.id}')">
+      <div class="order-card-hd"><span class="order-id">${o.id}</span><span class="order-date">${fmtTime(o.date)}</span></div>
+      <div class="order-card-bd">
+        <div class="order-summary">${itemsPreview}</div>
+        <div class="order-total">${money(o.total)}</div>
+        ${pill}
+      </div>
+    </div>`;
+  }).join('') + '<div style="height:16px"></div>';
+
+  window._ordersCache = ordersList;
+}
+
+// ━━━ ORDER DETAIL ━━━
+function openDetail(orderId) {
+  const orders = window._ordersCache || JSON.parse(localStorage.getItem('csw_orders') || '[]');
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+
+  document.getElementById('dOrderId').textContent = order.id;
+  document.getElementById('dDate').textContent = 'Создан: ' + fmtTime(order.date);
+
+  // Build timeline
+  const currentIdx = STATUS_FLOW.indexOf(order.status);
+  const tlHtml = STATUS_FLOW.map((status, idx) => {
+    const cfg = STATUS_CONFIG[status];
+    const tlEntry = order.timeline?.find(t => t.status === status);
+    let dotClass, labelClass, connClass;
+    if (idx < currentIdx) { dotClass = 'done'; labelClass = 'done'; connClass = 'done'; }
+    else if (idx === currentIdx) { dotClass = 'active'; labelClass = 'active'; connClass = 'future'; }
+    else { dotClass = 'future'; labelClass = 'future'; connClass = 'future'; }
+    const isLast = idx === STATUS_FLOW.length - 1;
+    return `<div class="tl-item">
+      <div class="tl-left">
+        <div class="tl-dot ${dotClass}">${dotClass === 'future' ? '' : cfg.emoji}</div>
+        ${!isLast ? `<div class="tl-connector ${idx < currentIdx ? 'done' : 'future'}"></div>` : ''}
+      </div>
+      <div class="tl-content">
+        <div class="tl-label ${labelClass}">${cfg.label}</div>
+        <div class="tl-time ${dotClass === 'done' || dotClass === 'active' ? 'done' : ''}">${tlEntry ? fmtTime(tlEntry.time) : (idx <= currentIdx ? fmtTime(order.date) : 'Ожидается')}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('dTimeline').innerHTML = '<div class="tl-section-title">Статус заказа</div>' + tlHtml;
+
+  // Items
+  document.getElementById('dItems').innerHTML =
+    '<div class="tl-section-title" style="padding-top:16px">Товары</div>' +
+    order.items.map(i => `<div class="detail-item-row"><span class="detail-item-name">${i.name} [${i.size}] × ${i.qty}</span><span class="detail-item-price">${money(i.sum)}</span></div>`).join('');
+
+  document.getElementById('dTotal').textContent = 'Итого: ' + money(order.total);
+
+  const mapBtn = document.getElementById('dMapBtn');
+  if (order.mapLink) { mapBtn.href = order.mapLink; mapBtn.style.display = 'block'; }
+  else mapBtn.style.display = 'none';
+
+  document.getElementById('detailOverlay').classList.add('open');
+}
+
+function closeDetail(e) {
+  if (e.target === document.getElementById('detailOverlay')) document.getElementById('detailOverlay').classList.remove('open');
+}
+
+// ━━━ INIT ━━━
+fetch('products.json').then(r => r.json()).then(data => { products = data; renderHome(); renderCatalog(); });
+</script>
+</body>
+</html>
