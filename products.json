@@ -5,7 +5,8 @@
     "price": 189000,
     "size": "S, M, L, XL",
     "photo": "vitality.jpg",
-    "description": "Официальная джерси Team Vitality, сезон 2026"
+    "description": "Официальная джерси Team Vitality, сезон 2026",
+    "type": "jersey"
   },
   {
     "id": 2,
@@ -13,7 +14,8 @@
     "price": 189000,
     "size": "S, M, L, XL",
     "photo": "Faze Clan.jpg",
-    "description": "Официальная джерси FaZe Clan"
+    "description": "Официальная джерси FaZe Clan",
+    "type": "jersey"
   },
   {
     "id": 3,
@@ -21,7 +23,8 @@
     "price": 189000,
     "size": "S, M, L, XL",
     "photo": "Team Spirit.jpg",
-    "description": "Официальная джерси Team Spirit"
+    "description": "Официальная джерси Team Spirit",
+    "type": "jersey"
   },
   {
     "id": 4,
@@ -29,7 +32,8 @@
     "price": 189000,
     "size": "S, M, L, XL",
     "photo": "Falcons.jpg",
-    "description": "Официальная джерси Falcons"
+    "description": "Официальная джерси Falcons",
+    "type": "jersey"
   },
   {
     "id": 5,
@@ -37,48 +41,70 @@
     "price": 189000,
     "size": "S, M, L, XL",
     "photo": "Navi.jpg",
-    "description": "Официальная джерси NAVI"
+    "description": "Официальная джерси NAVI",
+    "type": "jersey"
   },
   {
-  "id": 6,
-  "name": "Team spirit street jersey",
-  "price": 189000,
-  "size": "S, M, L, XL",
-  "photo": "Team spirit street.jpg",
-  "description": "Уличная джерси Team spirit"
+    "id": 6,
+    "name": "Team Spirit Street Jersey",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "Team spirit street.jpg",
+    "description": "Уличная джерси Team Spirit — стиль donk25",
+    "type": "jersey"
   },
   {
-  "id": 7,
-  "name": "Team spirit Donk jersey",
-  "price": 189000,
-  "size": "S, M, L, XL",
-  "photo": "donk yban.jpg",
-  "description": "Джерси Donk"
+    "id": 7,
+    "name": "Team Spirit Donk Jersey",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "donk yban.jpg",
+    "description": "Джерси Donk — Shanghai Major 2024",
+    "type": "jersey"
   },
   {
-  "id": 8,
-  "name": "FBI jersey",
-  "price": 189000,
-  "size": "S, M, L, XL",
-  "photo": "FBI.jpg",
-  "description": "Anti migration jersey"
+    "id": 8,
+    "name": "FBI Jersey",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "FBI.jpg",
+    "description": "FBI — Open The Fxxking Door!",
+    "type": "jersey"
   },
   {
-  "id": 9,
-  "name": "CS2 team phone case ",
-  "price": 89000,
-  "size": "iPhone 17 pro max, iPhone 17 pro, iPhone 17, iPhone 16 pro max, iPhone 16 pro, iPhone 16, iPhone 15 pro max, iPhone 15 pro max, iPhone 15 pro, iPhone 15, iPhone 14 pro max, iPhone 14 pro, iPhone 14, iPhone 13 pro max, iPhone 13 pro, iPhone 13",
-  "photo": "chexol.jpg",
-  "description": "Чехол"
+    "id": 9,
+    "name": "CS2 Team Phone Case",
+    "price": 89000,
+    "size": "iPhone 13, iPhone 13 Pro, iPhone 13 Pro Max, iPhone 14, iPhone 14 Pro, iPhone 14 Pro Max, iPhone 15, iPhone 15 Pro, iPhone 15 Pro Max, iPhone 16, iPhone 16 Pro, iPhone 16 Pro Max, iPhone 17, iPhone 17 Pro, iPhone 17 Pro Max",
+    "photo": "chexol.jpg",
+    "description": "Чехол CS2 с автографами игроков",
+    "type": "case",
+    "variants": ["G2", "Team Spirit", "NAVI", "Vitality", "FaZe", "Lynn Vision", "Astralis", "MOUZ"]
   },
   {
-  "id": 10,
-  "name": "Monecy x Niko phone case ",
-  "price": 89000,
-  "size": "iPhone 17 pro max, iPhone 17 pro, iPhone 17, iPhone 16 pro max, iPhone 16 pro, iPhone 16, iPhone 15 pro max, iPhone 15 pro max, iPhone 15 pro, iPhone 15, iPhone 14 pro max, iPhone 14 pro, iPhone 14, iPhone 13 pro max, iPhone 13 pro, iPhone 13",
-  "photo": "monesy chexol.jpg",
-  "description": "Чехол"
+    "id": 10,
+    "name": "Monesy x Niko Phone Case",
+    "price": 89000,
+    "size": "iPhone 13, iPhone 13 Pro, iPhone 13 Pro Max, iPhone 14, iPhone 14 Pro, iPhone 14 Pro Max, iPhone 15, iPhone 15 Pro, iPhone 15 Pro Max, iPhone 16, iPhone 16 Pro, iPhone 16 Pro Max, iPhone 17, iPhone 17 Pro, iPhone 17 Pro Max",
+    "photo": "monesy chexol.jpg",
+    "description": "Чехол Falcons — Monesy или NiKo",
+    "type": "case",
+    "variants": ["Monesy", "NiKo"]
+  },
+  {
+    "id": 11,
+    "name": "CS2 Mousepad",
+    "price": 65000,
+    "size": "60x30, 80x30, 90x40, 100x50, 120x60",
+    "photo": "kovrik.jpg",
+    "description": "CS2 коврик для мыши с автографами всех топ-игроков",
+    "type": "mousepad",
+    "sizePrices": {
+      "60x30": 65000,
+      "80x30": 75000,
+      "90x40": 80000,
+      "100x50": 95000,
+      "120x60": 110000
+    }
   }
-
-
 ]
