@@ -38,5 +38,47 @@
     "size": "S, M, L, XL",
     "photo": "Navi.jpg",
     "description": "Официальная джерси NAVI"
+  },
+  {
+  "id": 6,
+  "name": "Team spirit street jersey",
+  "price": 189000,
+  "size": "S, M, L, XL",
+  "photo": "Team spirit street.jpg",
+  "description": "Уличная джерси Team spirit"
+  },
+  {
+  "id": 7,
+  "name": "Team spirit Donk jersey",
+  "price": 189000,
+  "size": "S, M, L, XL",
+  "photo": "donk yban.jpg",
+  "description": "Джерси Donk"
+  },
+  {
+  "id": 8,
+  "name": "FBI jersey",
+  "price": 189000,
+  "size": "S, M, L, XL",
+  "photo": "FBI.jpg",
+  "description": "Anti migration jersey"
+  },
+  {
+  "id": 9,
+  "name": "CS2 team phone case ",
+  "price": 89000,
+  "size": "iPhone 17 pro max, iPhone 17 pro, iPhone 17, iPhone 16 pro max, iPhone 16 pro, iPhone 16, iPhone 15 pro max, iPhone 15 pro max, iPhone 15 pro, iPhone 15, iPhone 14 pro max, iPhone 14 pro, iPhone 14, iPhone 13 pro max, iPhone 13 pro, iPhone 13",
+  "photo": "chexol.jpg",
+  "description": "Чехол"
+  },
+  {
+  "id": 10,
+  "name": "Monecy x Niko phone case ",
+  "price": 89000,
+  "size": "iPhone 17 pro max, iPhone 17 pro, iPhone 17, iPhone 16 pro max, iPhone 16 pro, iPhone 16, iPhone 15 pro max, iPhone 15 pro max, iPhone 15 pro, iPhone 15, iPhone 14 pro max, iPhone 14 pro, iPhone 14, iPhone 13 pro max, iPhone 13 pro, iPhone 13",
+  "photo": "monesy chexol.jpg",
+  "description": "Чехол"
   }
+
+
 ]
