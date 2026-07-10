@@ -173,6 +173,7 @@
   .status-pill.shipped{background:rgba(130,100,220,.12);color:#8264DC;border:1px solid rgba(130,100,220,.3);}
   .status-pill.in_tashkent{background:rgba(61,190,122,.12);color:var(--success);border:1px solid rgba(61,190,122,.3);}
   .status-pill.delivered{background:rgba(61,190,122,.2);color:var(--success);border:1px solid var(--success);}
+  .status-pill.rejected{background:rgba(224,85,85,.15);color:var(--danger);border:1px solid rgba(224,85,85,.4);}
 
   /* ORDER DETAIL */
   .detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;z-index:250;}
@@ -734,6 +735,7 @@ document.getElementById('paymeName').textContent = PAYME_NAME;
 
 const STATUS_CONFIG = {
   pending:     { label: 'Заказ получен',       emoji: '📋' },
+  rejected:    { label: 'Оплата отклонена',    emoji: '❌' },
   confirmed:   { label: 'Оплата подтверждена', emoji: '✅' },
   shipped:     { label: 'Отправлен',           emoji: '📦' },
   in_tashkent: { label: 'В Ташкенте',          emoji: '🏙' },
