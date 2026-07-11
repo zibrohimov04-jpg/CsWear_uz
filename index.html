@@ -78,6 +78,11 @@
   .option-chip.price-chip .chip-size{font-size:13px;font-weight:700;}
   .option-chip.price-chip .chip-price{font-size:11px;font-weight:600;opacity:.8;}
   .size-guide{font-size:11px;color:var(--hint);margin-top:8px;line-height:1.5;padding:8px 12px;background:var(--card);border-radius:8px;border:1px solid var(--line);}
+  .color-chips{display:flex;flex-wrap:wrap;gap:10px;}
+  .color-chip{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:11px;border:1.5px solid var(--line);background:var(--card);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;}
+  .color-chip.selected{border-color:var(--accent);}
+  .color-swatch{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,0.2);flex-shrink:0;}
+  .color-chip.selected .color-swatch{border-color:var(--accent);}
   .detail-accordion{display:flex;justify-content:space-between;align-items:center;padding:12px 0;cursor:pointer;font-size:13px;font-weight:600;color:var(--hint);}
   .detail-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;}
   .detail-row:last-child{border-bottom:none;}
@@ -567,6 +572,12 @@
       <div class="option-chips" id="phoneChips"></div>
     </div>
 
+    <!-- Color variants -->
+    <div class="option-section" id="colorSection" style="display:none">
+      <div class="option-label">🎨 Цвет</div>
+      <div class="color-chips" id="colorChips"></div>
+    </div>
+
     <!-- Details accordion -->
     <div class="product-divider"></div>
     <div class="detail-accordion" onclick="toggleDetails()">
@@ -749,7 +760,7 @@ const USER_ID = tg?.initDataUnsafe?.user?.id
   || localStorage.getItem('csw_uid')
   || (() => { const id = 'u' + Date.now(); localStorage.setItem('csw_uid', id); return id; })();
 
-let products = [], cart = {}, currentProduct = null, selectedVariant = null, selectedSize = null, selectedPhone = null, selectedPadSize = null, activePromo = null, deliveryLocation = null, pendingOrder = null, map = null, marker = null;
+let products = [], cart = {}, currentProduct = null, selectedVariant = null, selectedSize = null, selectedPhone = null, selectedPadSize = null, selectedColor = null, activePromo = null, deliveryLocation = null, pendingOrder = null, map = null, marker = null;
 
 function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -822,7 +833,8 @@ function openProduct(id) {
   document.getElementById('detailArrow').textContent = '▼';
 
   // Reset all option sections
-  ['variantSection','sizeSection','padSection','phoneSection'].forEach(sid => {
+  selectedColor = null;
+  ['variantSection','sizeSection','padSection','phoneSection','colorSection'].forEach(sid => {
     document.getElementById(sid).style.display = 'none';
   });
 
@@ -852,6 +864,17 @@ function openProduct(id) {
       `<button class="option-chip price-chip" onclick="selectPad('${size}', ${price}, this)">
         <span class="chip-size">${size} см</span>
         <span class="chip-price">${money(price)}</span>
+      </button>`
+    ).join('');
+  }
+
+  // Color swatches (for jerseys and mousepads with colors)
+  if (currentProduct.colors && currentProduct.colors.length > 0) {
+    document.getElementById('colorSection').style.display = 'block';
+    document.getElementById('colorChips').innerHTML = currentProduct.colors.map(c =>
+      `<button class="color-chip" onclick="selectColor('${c.label}', this)" style="--swatch:${c.hex}">
+        <span class="color-swatch" style="background:${c.hex}"></span>
+        ${c.label}
       </button>`
     ).join('');
   }
@@ -897,20 +920,30 @@ function selectPad(size, price, el) {
   el.classList.add('selected');
 }
 
+function selectColor(label, el) {
+  selectedColor = label;
+  document.querySelectorAll('#colorChips .color-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
 let currentCartKey = null;
 
 function getProductKey() {
   const p = currentProduct;
   if (p.type === 'jersey') {
     if (!selectedSize) { alert('Выберите размер'); return null; }
-    return { key: `${p.id}_${selectedSize}`, size: selectedSize, price: p.price };
+    if (p.colors && p.colors.length > 0 && !selectedColor) { alert('Выберите цвет'); return null; }
+    const sizeLabel = selectedColor ? `${selectedSize} | ${selectedColor}` : selectedSize;
+    return { key: `${p.id}_${selectedSize}_${selectedColor||''}`, size: sizeLabel, price: p.price };
   } else if (p.type === 'case') {
     if (!selectedVariant) { alert('Выберите дизайн'); return null; }
     if (!selectedPhone) { alert('Выберите модель телефона'); return null; }
     return { key: `${p.id}_${selectedVariant}_${selectedPhone}`, size: `${selectedVariant} | ${selectedPhone}`, price: p.price };
   } else if (p.type === 'mousepad') {
     if (!selectedPadSize) { alert('Выберите размер коврика'); return null; }
-    return { key: `${p.id}_${selectedPadSize}`, size: `${selectedPadSize} см`, price: p.sizePrices[selectedPadSize] };
+    if (p.colors && p.colors.length > 0 && !selectedColor) { alert('Выберите цвет'); return null; }
+    const padLabel = selectedColor ? `${selectedPadSize} см | ${selectedColor}` : `${selectedPadSize} см`;
+    return { key: `${p.id}_${selectedPadSize}_${selectedColor||''}`, size: padLabel, price: p.sizePrices[selectedPadSize] };
   }
   return null;
 }
