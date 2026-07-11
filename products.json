@@ -23,7 +23,7 @@
     "price": 189000,
     "size": "S, M, L, XL",
     "photo": "Team Spirit.jpg",
-    "description": "Официальная джерси Team Spirit",
+    "description": "Официальная джерси Team Spirit с принтом дракона",
     "type": "jersey"
   },
   {
@@ -32,7 +32,7 @@
     "price": 189000,
     "size": "S, M, L, XL",
     "photo": "Falcons.jpg",
-    "description": "Официальная джерси Falcons",
+    "description": "Официальная джерси Falcons Esports",
     "type": "jersey"
   },
   {
@@ -41,7 +41,7 @@
     "price": 189000,
     "size": "S, M, L, XL",
     "photo": "Navi.jpg",
-    "description": "Официальная джерси NAVI",
+    "description": "Официальная джерси NAVI — легендарная команда CS2",
     "type": "jersey"
   },
   {
@@ -50,7 +50,7 @@
     "price": 189000,
     "size": "S, M, L, XL",
     "photo": "Team spirit street.jpg",
-    "description": "Уличная джерси Team Spirit — стиль donk25",
+    "description": "Уличная джерси Team Spirit в стиле donk25 — Shanghai Major",
     "type": "jersey"
   },
   {
@@ -59,7 +59,7 @@
     "price": 189000,
     "size": "S, M, L, XL",
     "photo": "donk yban.jpg",
-    "description": "Джерси Donk — Shanghai Major 2024",
+    "description": "Джерси Donk — лучшего игрока Shanghai Major 2024",
     "type": "jersey"
   },
   {
@@ -68,7 +68,7 @@
     "price": 189000,
     "size": "S, M, L, XL",
     "photo": "FBI.jpg",
-    "description": "FBI — Open The Fxxking Door!",
+    "description": "FBI — Open The Fxxking Door! Культовая мем-футболка CS2",
     "type": "jersey"
   },
   {
@@ -77,7 +77,7 @@
     "price": 89000,
     "size": "iPhone 13, iPhone 13 Pro, iPhone 13 Pro Max, iPhone 14, iPhone 14 Pro, iPhone 14 Pro Max, iPhone 15, iPhone 15 Pro, iPhone 15 Pro Max, iPhone 16, iPhone 16 Pro, iPhone 16 Pro Max, iPhone 17, iPhone 17 Pro, iPhone 17 Pro Max",
     "photo": "chexol.jpg",
-    "description": "Чехол CS2 с автографами игроков",
+    "description": "Прозрачный чехол CS2 с автографами игроков и логотипом команды",
     "type": "case",
     "variants": ["G2", "Team Spirit", "NAVI", "Vitality", "FaZe", "Lynn Vision", "Astralis", "MOUZ"]
   },
@@ -87,7 +87,7 @@
     "price": 89000,
     "size": "iPhone 13, iPhone 13 Pro, iPhone 13 Pro Max, iPhone 14, iPhone 14 Pro, iPhone 14 Pro Max, iPhone 15, iPhone 15 Pro, iPhone 15 Pro Max, iPhone 16, iPhone 16 Pro, iPhone 16 Pro Max, iPhone 17, iPhone 17 Pro, iPhone 17 Pro Max",
     "photo": "monesy chexol.jpg",
-    "description": "Чехол Falcons — Monesy или NiKo",
+    "description": "Чехол Falcons — выбери дизайн Monesy или NiKo",
     "type": "case",
     "variants": ["Monesy", "NiKo"]
   },
@@ -97,7 +97,7 @@
     "price": 65000,
     "size": "60x30, 80x30, 90x40, 100x50, 120x60",
     "photo": "kovrik.jpg",
-    "description": "CS2 коврик для мыши с автографами всех топ-игроков",
+    "description": "CS2 коврик для мыши с автографами всех топ-игроков мира",
     "type": "mousepad",
     "sizePrices": {
       "60x30": 65000,
@@ -105,6 +105,139 @@
       "90x40": 80000,
       "100x50": 95000,
       "120x60": 110000
+    }
+  },
+  {
+    "id": 12,
+    "name": "Printstream Phone Case",
+    "price": 89000,
+    "size": "iPhone 13, iPhone 13 Pro, iPhone 13 Pro Max, iPhone 14, iPhone 14 Pro, iPhone 14 Pro Max, iPhone 15, iPhone 15 Pro, iPhone 15 Pro Max, iPhone 16, iPhone 16 Pro, iPhone 16 Pro Max, iPhone 17, iPhone 17 Pro, iPhone 17 Pro Max",
+    "photo": "xxxx chexol.jpg",
+    "description": "Чехол в стиле скина Printstream — минималистичный и стильный",
+    "type": "case",
+    "variants": ["White", "Black"]
+  },
+  {
+    "id": 13,
+    "name": "FaZe Street Jersey",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "faze street t-shirt.jpg",
+    "description": "Уличная футболка FaZe Clan — streetwear стиль легендарной команды",
+    "type": "jersey",
+    "colors": [
+      { "label": "Белый", "hex": "#FFFFFF" },
+      { "label": "Чёрный", "hex": "#1A1A1A" }
+    ]
+  },
+  {
+    "id": 14,
+    "name": "Rush B Jersey",
+    "price": 209000,
+    "size": "S, M, L, XL",
+    "photo": "suka blyat.jpg",
+    "description": "Rush B — культовая кричалка CS2 на каждом раунде",
+    "type": "jersey"
+  },
+  {
+    "id": 15,
+    "name": "CS2 Daily Jersey",
+    "price": 209000,
+    "size": "S, M, L, XL",
+    "photo": "sex jersey.jpg",
+    "description": "CS2 Daily — носи любимую игру каждый день",
+    "type": "jersey"
+  },
+  {
+    "id": 16,
+    "name": "Team Liquid 2025",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "team liquid 25.jpg",
+    "description": "Официальная джерси Team Liquid, сезон 2025",
+    "type": "jersey"
+  },
+  {
+    "id": 17,
+    "name": "Mongolz 2025 Jersey",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "Mongolz 25.jpg",
+    "description": "Официальная джерси The Mongolz — гордость азиатского CS2",
+    "type": "jersey"
+  },
+  {
+    "id": 18,
+    "name": "Aurora Jersey 2025",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "Aurora 25 .jpg",
+    "description": "Официальная джерси Aurora Gaming, сезон 2025",
+    "type": "jersey"
+  },
+  {
+    "id": 19,
+    "name": "G2 Street Jersey",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "g2 street t-shirt.jpg",
+    "description": "G2 Esports в уличном стиле — streetwear для настоящих фанатов",
+    "type": "jersey"
+  },
+  {
+    "id": 20,
+    "name": "CS2 Street Jersey",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "cs2 street jersey.jpg",
+    "description": "CS2 Street — стильная уличная футболка с брендингом игры",
+    "type": "jersey"
+  },
+  {
+    "id": 21,
+    "name": "G2 2026 New Jersey",
+    "price": 299000,
+    "size": "S, M, L, XL",
+    "photo": "G2 2026 new jersey.jpg",
+    "description": "Новейшая джерси G2 Esports 2026 — лимитированная коллекция",
+    "type": "jersey"
+  },
+  {
+    "id": 22,
+    "name": "B Rush Yandexchi Nogron",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "invalid.jpg",
+    "description": "Rush B — для тех кто всегда идёт вперёд без остановок",
+    "type": "jersey"
+  },
+  {
+    "id": 23,
+    "name": "Low Cortisol T-Shirt",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "cortisol.jpg",
+    "description": "Low Cortisol — stay calm, play better. Мем-культура CS2",
+    "type": "jersey"
+  },
+  {
+    "id": 24,
+    "name": "CSGO Kovrik",
+    "price": 84990,
+    "size": "60x30, 80x30, 90x40, 100x50",
+    "photo": "barbie kovrik.jpg",
+    "description": "CSGO коврик для мыши — доступен в трёх цветах",
+    "type": "mousepad",
+    "colors": [
+      { "label": "Розовый", "hex": "#FF69B4" },
+      { "label": "Белый",   "hex": "#FFFFFF" },
+      { "label": "Чёрный",  "hex": "#1A1A1A" }
+    ],
+    "sizePrices": {
+      "60x30": 84990,
+      "80x30": 99990,
+      "90x40": 119000,
+      "100x50": 139000
     }
   }
 ]
