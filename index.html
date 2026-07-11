@@ -581,7 +581,7 @@
   </div>
   <div class="social-row" style="padding:8px 16px 20px">
     <a class="social-btn" href="https://instagram.com/cswear_uz" target="_blank">📸 Instagram</a>
-    <a class="social-btn" href="https://t.me/cswear_uz" target="_blank">✈️ Канал</a>
+    <a class="social-btn" href="https://t.me/cswear_uz" target="_blank" rel="noopener" target="_blank">✈️ Канал</a>
   </div>
   <div style="height:8px"></div>
 </div>
@@ -592,7 +592,7 @@
   <div style="padding:10px 16px 6px">
     <input id="catalogSearch" placeholder="🔍 Поиск в коллекции..." oninput="doCatalogSearch()" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 14px;color:var(--text);font-size:14px;font-family:inherit">
   </div>
-  <div style="padding:0 16px 10px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch">
+  <div id="catalogFilters" style="padding:0 16px 10px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch">
     <button class="filter-chip active" onclick="filterCatalog('all',this)">Все</button>
     <button class="filter-chip" onclick="filterCatalog('jersey',this)">👕 Джерси</button>
     <button class="filter-chip" onclick="filterCatalog('case',this)">📱 Чехлы</button>
@@ -610,7 +610,7 @@
 
   <!-- Hero image -->
   <div class="product-hero">
-    <img id="productPageImg" src="" alt="" onclick="openZoom(this.src)" style="cursor:zoom-in">
+    <img id="productPageImg" src="" alt="" style="cursor:zoom-in;-webkit-tap-highlight-color:transparent;">
     <div class="product-hero-fade"></div>
   </div>
 
@@ -624,7 +624,7 @@
 
     <!-- Stock + delivery row -->
     <div class="product-meta-row">
-      <span class="stock-badge">🟢 В наличии</span>
+      <span class="stock-badge" id="stockBadge">🟢 В наличии</span>
       <span class="delivery-badge">📦 7–14 дней</span>
     </div>
 
@@ -835,7 +835,7 @@
   <div style="padding:0 16px 8px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--hint)">Мы в соцсетях</div>
   <div class="social-row">
     <a class="social-btn" href="https://instagram.com/cswear_uz" target="_blank">📸 Instagram</a>
-    <a class="social-btn" href="https://t.me/cswear_uz" target="_blank">✈️ Telegram</a>
+    <a class="social-btn" href="https://t.me/cswear_uz" target="_blank" rel="noopener" target="_blank">✈️ Telegram</a>
   </div>
   <div style="padding:0 16px 8px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--hint)">Язык / Til</div>
   <div style="display:flex;gap:10px;padding:0 16px 20px">
@@ -1025,18 +1025,62 @@ function setLang(lang) {
 
 function applyLang() {
   try {
-    // Update flag opacity
+    // Flag buttons
     const ruBtn = document.getElementById('langRU');
     const uzBtn = document.getElementById('langUZ');
     const ruSettings = document.getElementById('settingsLangRU');
     const uzSettings = document.getElementById('settingsLangUZ');
     if (ruBtn) ruBtn.style.opacity = currentLang === 'ru' ? '1' : '0.4';
     if (uzBtn) uzBtn.style.opacity = currentLang === 'uz' ? '1' : '0.4';
-    if (ruSettings) { ruSettings.style.borderColor = currentLang === 'ru' ? 'var(--accent)' : 'var(--line)'; }
-    if (uzSettings) { uzSettings.style.borderColor = currentLang === 'uz' ? 'var(--accent)' : 'var(--line)'; }
-    // Update search placeholder
-    const searchEl = document.getElementById('catalogSearch');
-    if (searchEl) searchEl.placeholder = t('searchPlaceholder');
+    if (ruSettings) ruSettings.style.borderColor = currentLang === 'ru' ? 'var(--accent)' : 'var(--line)';
+    if (uzSettings) uzSettings.style.borderColor = currentLang === 'uz' ? 'var(--accent)' : 'var(--line)';
+
+    // Nav labels
+    const navKeys = ['home','catalog','cart','orders','more'];
+    document.querySelectorAll('.nav-btn').forEach((btn, i) => {
+      // Last text node of each nav button is the label
+      const walker = document.createTreeWalker(btn, NodeFilter.SHOW_TEXT);
+      let node, last;
+      while((node = walker.nextNode())) last = node;
+      if (last) last.textContent = t(navKeys[i]);
+    });
+
+    // Static text elements by ID
+    const els = {
+      'catalogSearch': { attr: 'placeholder', key: 'searchPlaceholder' },
+      'searchInput':   { attr: 'placeholder', key: 'searchPlaceholder' },
+    };
+    Object.entries(els).forEach(([id, {attr, key}]) => {
+      const el = document.getElementById(id);
+      if (el) el[attr] = t(key);
+    });
+
+    // Re-render current screen content
+    renderHome();
+    renderCatalog();
+    if (document.getElementById('screen-orders').classList.contains('active')) renderOrders();
+    if (document.getElementById('screen-product').classList.contains('active') && currentProduct) openProduct(currentProduct.id);
+    if (document.getElementById('screen-cart').classList.contains('active')) renderCart();
+
+    // Update catalog filter chips
+    const catFilters = document.getElementById('catalogFilters');
+    if (catFilters) {
+      const btns = catFilters.querySelectorAll('.filter-chip');
+      const labels = [t('all'), '👕 ' + (currentLang==='uz'?'Jersi':'Джерси'),
+        '📱 ' + (currentLang==='uz'?'Qoplamalar':'Чехлы'),
+        '🖱 ' + (currentLang==='uz'?'Gilam':'Коврики')];
+      btns.forEach((btn, i) => { if(labels[i]) btn.textContent = labels[i]; });
+    }
+
+    // Update checkout form labels
+    const labelMap = {
+      'f-name': 'name', 'f-phone': 'phone', 'f-tg': 'tg',
+      'f-note': 'comment', 'f-promo': 'promo'
+    };
+    Object.entries(labelMap).forEach(([id, key]) => {
+      const el = document.getElementById(id);
+      if (el) el.placeholder = t(key) + '...';
+    });
   } catch(e) { console.error('applyLang error:', e); }
 }
 
@@ -1067,14 +1111,20 @@ function renderHome() {
     <img src="${p.photo}" alt="${p.name}" loading="lazy">
     <div class="featured-card-body"><div class="fc-name">${p.name}</div><div class="fc-price">${money(p.price)}</div></div>
   </div>`;
-  // Popular — products with badge:'hit' or first 5
   const popular = products.filter(p => p.badge === 'hit').length > 0
-    ? products.filter(p => p.badge === 'hit')
-    : products.slice(0, 5);
+    ? products.filter(p => p.badge === 'hit') : products.slice(0, 5);
   document.getElementById('featuredScroll').innerHTML = popular.map(featCard).join('');
-  // New arrivals — last 4-5 by id
   const sorted = [...products].sort((a,b) => b.id - a.id).slice(0,5);
   document.getElementById('newArrivalsScroll').innerHTML = sorted.map(featCard).join('');
+
+  // Translate section titles
+  const sectionTitles = document.querySelectorAll('.section-title');
+  const titleKeys = [null, 'newArrivals', 'popular', 'recent'];
+  sectionTitles.forEach((el, i) => {
+    if (titleKeys[i]) el.textContent = titleKeys[i] === 'newArrivals' ? t('newArrivals') :
+      titleKeys[i] === 'popular' ? t('popular') : t('recent');
+  });
+
   renderRecent();
 }
 
@@ -1120,6 +1170,13 @@ function openProduct(id) {
   // Reset details accordion
   document.getElementById('detailBody').style.display = 'none';
   document.getElementById('detailArrow').textContent = '▼';
+  // Apply translations to product page
+  const stockEl = document.getElementById('stockBadge');
+  if (stockEl) stockEl.textContent = t('inStock');
+  const addBtn = document.getElementById('addToCartBtn');
+  if (addBtn && addBtn.style.display !== 'none') {
+    addBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg> ' + t('addToCart');
+  }
 
   // Reset all option sections
   selectedColor = null;
@@ -1191,6 +1248,7 @@ function openProduct(id) {
   currentCartKey = null;
   showScreen('product');
   document.getElementById('screen-product').scrollTop = 0;
+  setTimeout(attachZoom, 50);
 }
 
 function selectVariant(v, el) {
@@ -1323,7 +1381,7 @@ function renderCart() {
   const keys = Object.keys(cart);
   const container = document.getElementById('cartItems');
   const footer = document.getElementById('cartFooter');
-  if (!keys.length) { container.innerHTML = '<div class="empty-msg">Корзина пуста.<br>Добавьте товары из коллекции.</div>'; footer.style.display = 'none'; return; }
+  if (!keys.length) { container.innerHTML = `<div class="empty-msg">${t('cartEmpty').replace('\\n','<br>')}<br><br><button class="primary-btn" style="max-width:200px;margin:0 auto" onclick="showScreen('catalog')">${t('catalog')}</button></div>`; footer.style.display = 'none'; return; }
   container.innerHTML = keys.map(key => {
     const {product:p, size, qty} = cart[key];
     return `<div class="cart-item">
@@ -1372,7 +1430,7 @@ function initMap() {
       deliveryLocation = e.latlng;
       if (marker) marker.setLatLng(e.latlng);
       else { marker = L.marker(e.latlng, {icon, draggable:true}).addTo(map); marker.on('dragend', () => { deliveryLocation = marker.getLatLng(); }); }
-      document.getElementById('mapOk').classList.add('show');
+      const mapOkEl = document.getElementById('mapOk'); mapOkEl.textContent = t('mapOk'); mapOkEl.classList.add('show');
     });
   }, 100);
 }
@@ -1423,13 +1481,13 @@ async function confirmPayment() {
 // ── ORDERS ──
 async function renderOrders() {
   const container = document.getElementById('ordersList');
-  container.innerHTML = '<div class="empty-msg" style="padding:30px">Загрузка...</div>';
+  container.innerHTML = `<div class="empty-msg" style="padding:30px">${t('loading')}</div>`;
   let ordersList = [];
   try {
     const res = await fetch(BACKEND_URL + '/orders/' + USER_ID);
     ordersList = await res.json();
   } catch(e) { ordersList = []; }
-  if (!ordersList.length) { container.innerHTML = '<div class="empty-msg">У вас пока нет заказов.</div>'; return; }
+  if (!ordersList.length) { container.innerHTML = `<div class="empty-msg">${t('noOrders')}</div>`; return; }
   window._ordersCache = ordersList;
   container.innerHTML = ordersList.map(o => {
     const cfg = STATUS_CONFIG[o.status] || STATUS_CONFIG.pending;
@@ -1618,9 +1676,18 @@ function showSuccessReceipt(order) {
 function openZoom(src) {
   document.getElementById('zoomImg').src = src;
   document.getElementById('zoomOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 function closeZoom() {
   document.getElementById('zoomOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+// Attach zoom to product image after page loads
+function attachZoom() {
+  const img = document.getElementById('productPageImg');
+  if (!img) return;
+  img.addEventListener('click', () => { if(img.src) openZoom(img.src); }, { passive: true });
+  img.addEventListener('touchend', (e) => { e.preventDefault(); if(img.src) openZoom(img.src); }, { passive: false });
 }
 
 // ── SHARE PRODUCT ──
