@@ -30,7 +30,7 @@
   .back-row h2{font-size:18px;font-weight:700;}
 
   /* HOME */
-  .hero{background:linear-gradient(160deg,#0F1E38 0%,#0A1628 60%);padding:36px 20px 28px;text-align:center;border-bottom:1px solid var(--line);}
+  .hero{background:linear-gradient(160deg,#0F1E38 0%,#0A1628 60%);padding:36px 20px 28px;text-align:center;border-bottom:1px solid var(--line);position:relative;}
   .hero-logo{font-size:32px;font-weight:900;letter-spacing:-1px;}.hero-logo span{color:var(--accent);}
   .hero-sub{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--hint);margin-top:4px;}
   .hero-tagline{margin-top:16px;font-size:15px;line-height:1.5;color:var(--hint);max-width:260px;margin-left:auto;margin-right:auto;}
@@ -211,6 +211,16 @@
 
   /* MORE / FAQ / SEARCH */
   .more-btn{display:flex;align-items:center;gap:14px;width:100%;padding:16px;background:var(--card);border:1px solid var(--line);border-radius:14px;color:var(--text);font-size:15px;font-weight:600;cursor:pointer;text-align:left;}
+  .social-row{display:flex;gap:10px;padding:0 16px 16px;}
+  .social-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--text);font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;}
+  .share-btn{display:flex;align-items:center;gap:6px;padding:10px 14px;background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--hint);font-size:13px;font-weight:600;cursor:pointer;margin-top:10px;width:100%;}
+  .share-copied{color:var(--success)!important;border-color:var(--success)!important;}
+  .zoom-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:400;display:none;align-items:center;justify-content:center;flex-direction:column;}
+  .zoom-overlay.open{display:flex;}
+  .zoom-overlay img{max-width:100%;max-height:85vh;object-fit:contain;}
+  .zoom-close{position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:24px;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .cancel-section{padding:16px;border-top:1px solid var(--line);margin-top:8px;}
+  .cancel-btn{width:100%;padding:11px;background:transparent;border:1px solid var(--danger);color:var(--danger);border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;}
   .more-arrow{margin-left:auto;color:var(--hint);font-size:18px;}
   .faq-item{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;}
   .faq-q{padding:14px 16px;font-size:14px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
@@ -538,6 +548,10 @@
   <div class="hero">
     <div class="hero-logo"><span>CS</span>WEAR UZ</div>
     <div class="hero-sub">Esports Merch</div>
+    <div style="position:absolute;top:16px;right:16px;display:flex;gap:6px">
+      <button id="langRU" onclick="setLang('ru')" style="background:none;border:none;font-size:20px;cursor:pointer;opacity:1">🇷🇺</button>
+      <button id="langUZ" onclick="setLang('uz')" style="background:none;border:none;font-size:20px;cursor:pointer;opacity:0.4">🇺🇿</button>
+    </div>
     <div class="hero-tagline">Официальные джерси, чехлы и аксессуары киберспортивных команд</div>
     <button class="hero-btn" onclick="showScreen('catalog')">Смотреть коллекцию →</button>
   </div>
@@ -561,9 +575,13 @@
   </div>
 
   <!-- Contact + FAQ row -->
-  <div style="display:flex;gap:10px;padding:8px 16px 20px">
+  <div style="display:flex;gap:10px;padding:8px 16px 4px">
     <button class="home-action-btn" onclick="showScreen('faq')">❓ FAQ</button>
     <button class="home-action-btn" onclick="openTelegram()">💬 Написать нам</button>
+  </div>
+  <div class="social-row" style="padding:8px 16px 20px">
+    <a class="social-btn" href="https://instagram.com/cswear_uz" target="_blank">📸 Instagram</a>
+    <a class="social-btn" href="https://t.me/cswear_uz" target="_blank">✈️ Канал</a>
   </div>
   <div style="height:8px"></div>
 </div>
@@ -592,7 +610,7 @@
 
   <!-- Hero image -->
   <div class="product-hero">
-    <img id="productPageImg" src="" alt="">
+    <img id="productPageImg" src="" alt="" onclick="openZoom(this.src)" style="cursor:zoom-in">
     <div class="product-hero-fade"></div>
   </div>
 
@@ -612,6 +630,7 @@
 
     <!-- Description -->
     <div class="product-desc" id="productPageDesc"></div>
+    <button class="share-btn" id="shareBtn" onclick="shareProduct()">🔗 Поделиться товаром</button>
 
     <!-- Divider -->
     <div class="product-divider"></div>
@@ -779,6 +798,11 @@
     <div class="detail-items" id="dItems"></div>
     <div class="detail-total" id="dTotal"></div>
     <a class="detail-map-btn" id="dMapBtn" href="#" target="_blank" style="display:none">📍 Открыть точку доставки на карте</a>
+    <div class="cancel-section" id="cancelSection" style="display:none">
+      <div style="font-size:12px;color:var(--hint);margin-bottom:8px">Заказ можно отменить до подтверждения оплаты</div>
+      <textarea id="cancelReason" rows="2" placeholder="Причина отмены..." style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text);font-size:14px;font-family:inherit;margin-bottom:8px"></textarea>
+      <button class="cancel-btn" onclick="submitCancellation()">❌ Отменить заказ</button>
+    </div>
   </div>
 </div>
 
@@ -807,6 +831,16 @@
     <button class="more-btn" onclick="openTelegram()">
       <span>💬</span><span>Написать нам</span><span class="more-arrow">›</span>
     </button>
+  </div>
+  <div style="padding:0 16px 8px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--hint)">Мы в соцсетях</div>
+  <div class="social-row">
+    <a class="social-btn" href="https://instagram.com/cswear_uz" target="_blank">📸 Instagram</a>
+    <a class="social-btn" href="https://t.me/cswear_uz" target="_blank">✈️ Telegram</a>
+  </div>
+  <div style="padding:0 16px 8px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--hint)">Язык / Til</div>
+  <div style="display:flex;gap:10px;padding:0 16px 20px">
+    <button onclick="setLang('ru')" id="settingsLangRU" style="flex:1;padding:12px;background:var(--card);border:1.5px solid var(--accent);border-radius:12px;color:var(--text);font-size:14px;font-weight:600;cursor:pointer">🇷🇺 Русский</button>
+    <button onclick="setLang('uz')" id="settingsLangUZ" style="flex:1;padding:12px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;color:var(--text);font-size:14px;font-weight:600;cursor:pointer">🇺🇿 O'zbek</button>
   </div>
 </div>
 
@@ -860,6 +894,12 @@
   </div>
 </div>
 
+<!-- ZOOM OVERLAY -->
+<div class="zoom-overlay" id="zoomOverlay">
+  <button class="zoom-close" onclick="closeZoom()">✕</button>
+  <img id="zoomImg" src="" alt="">
+</div>
+
 <nav class="nav">
   <button class="nav-btn active" id="nav-home" onclick="showScreen('home')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Главная
@@ -909,6 +949,97 @@ if (tg) { tg.ready(); tg.expand(); }
 const USER_ID = tg?.initDataUnsafe?.user?.id
   || localStorage.getItem('csw_uid')
   || (() => { const id = 'u' + Date.now(); localStorage.setItem('csw_uid', id); return id; })();
+
+// ── LANGUAGE SYSTEM ──
+const LANGS = {
+  ru: {
+    home: 'Главная', catalog: 'Коллекция', cart: 'Корзина', orders: 'Заказы', more: 'Ещё',
+    inStock: '🟢 В наличии', delivery: '📦 7–14 дней', addToCart: 'В корзину',
+    chooseSize: '📐 ВЫБЕРИТЕ РАЗМЕР', chooseDesign: '🎨 Выберите дизайн',
+    choosePad: '📐 Размер коврика', choosePhone: '📱 Модель телефона', chooseColor: '🎨 Цвет',
+    details: '📋 Детали товара', similar: '👀 Похожие товары',
+    newArrivals: '🆕 Новинки', popular: '💎 Топ выбор', recent: '👀 Недавно смотрели',
+    myOrders: 'Мои заказы', refresh: '↻ Обновить', noOrders: 'У вас пока нет заказов.',
+    loading: 'Загрузка...', cartEmpty: 'Корзина пуста.
+Добавьте товары из коллекции.',
+    checkout: 'Перейти к оформлению →', orderTitle: 'Оформление',
+    name: 'Имя', phone: 'Телефон', tg: 'Telegram (необязательно)',
+    comment: 'Комментарий', promo: 'Промокод', promoApply: 'Применить',
+    deliveryAddr: 'Адрес доставки', mapHint: '📍 Нажмите на карту чтобы поставить метку. Метку можно перетаскивать.',
+    mapOk: '✓ Точка доставки выбрана', deliveryBanner: '📦 Срок доставки: <b>7–14 дней</b> с момента подтверждения оплаты.',
+    toPayment: 'Перейти к оплате →', payment: 'Оплата', afterPayment: 'После оплаты прикрепите скриншот чека:',
+    attachScreenshot: 'Нажмите чтобы прикрепить скриншот', confirmPayment: 'Подтвердить оплату ✓',
+    orderAccepted: 'Заказ принят!', successText: 'После проверки оплаты вы получите уведомление в боте. Следите за статусом в разделе «Заказы».',
+    toHome: 'На главную', myOrdersBtn: 'Мои заказы →',
+    cancelOrder: '❌ Отменить заказ', cancelReason: 'Причина отмены',
+    cancelReasonHint: 'Почему вы хотите отменить заказ?', cancelSend: 'Отправить запрос',
+    share: '🔗 Поделиться', zoom: 'Нажмите для увеличения',
+    searchPlaceholder: '🔍 Поиск в коллекции...', all: 'Все',
+    faq: 'Вопросы и ответы', contact: 'Написать нам', search: 'Поиск товаров',
+    yourOrder: 'Ваш заказ', expectedDelivery: '📦 Ожидаемая доставка',
+    total: 'Итого', subtotal: 'Подытог',
+  },
+  uz: {
+    home: 'Bosh sahifa', catalog: 'Kolleksiya', cart: 'Savat', orders: 'Buyurtmalar', more: 'Yana',
+    inStock: '🟢 Mavjud', delivery: '📦 7–14 kun', addToCart: 'Savatga',
+    chooseSize: '📐 O'LCHAMNI TANLANG', chooseDesign: '🎨 Dizaynni tanlang',
+    choosePad: '📐 Gilam o'lchami', choosePhone: '📱 Telefon modeli', chooseColor: '🎨 Rang',
+    details: '📋 Mahsulot tafsilotlari', similar: '👀 O'xshash mahsulotlar',
+    newArrivals: '🆕 Yangiliklar', popular: '💎 Top tanlov', recent: '👀 Yaqinda ko'rilgan',
+    myOrders: 'Buyurtmalarim', refresh: '↻ Yangilash', noOrders: 'Hali buyurtma yo'q.',
+    loading: 'Yuklanmoqda...', cartEmpty: 'Savat bo'sh.
+Kolleksiyadan mahsulot qo'shing.',
+    checkout: 'Rasmiylashtirish →', orderTitle: 'Rasmiylashtirish',
+    name: 'Ism', phone: 'Telefon', tg: 'Telegram (ixtiyoriy)',
+    comment: 'Izoh', promo: 'Promo kod', promoApply: 'Qo'llash',
+    deliveryAddr: 'Yetkazib berish manzili', mapHint: '📍 Belgi qo'yish uchun xaritaga bosing. Belgini sudrab o'tkazish mumkin.',
+    mapOk: '✓ Yetkazib berish nuqtasi tanlandi', deliveryBanner: '📦 Yetkazib berish muddati: <b>7–14 kun</b> to'lovni tasdiqlanganidan keyin.',
+    toPayment: 'To'lovga o'tish →', payment: 'To'lov', afterPayment: 'To'lovdan so'ng chek skrinshotini biriktiring:',
+    attachScreenshot: 'Skrinshot biriktirish uchun bosing', confirmPayment: 'To'lovni tasdiqlash ✓',
+    orderAccepted: 'Buyurtma qabul qilindi!', successText: 'To'lov tekshirilgandan so'ng xabarnoma olasiz. «Buyurtmalar» bo'limida holatni kuzating.',
+    toHome: 'Bosh sahifaga', myOrdersBtn: 'Buyurtmalarim →',
+    cancelOrder: '❌ Buyurtmani bekor qilish', cancelReason: 'Bekor qilish sababi',
+    cancelReasonHint: 'Nima uchun buyurtmani bekor qilmoqchisiz?', cancelSend: 'So'rov yuborish',
+    share: '🔗 Ulashish', zoom: 'Kattalashtirish uchun bosing',
+    searchPlaceholder: '🔍 Kolleksiyada qidirish...', all: 'Barchasi',
+    faq: 'Ko'p so'raladigan savollar', contact: 'Biz bilan bog'lanish', search: 'Mahsulot qidirish',
+    yourOrder: 'Buyurtmangiz', expectedDelivery: '📦 Kutilayotgan yetkazib berish',
+    total: 'Jami', subtotal: 'Oraliq jami',
+  }
+};
+
+let currentLang = (() => {
+  const saved = localStorage.getItem('csw_lang');
+  if (saved) return saved;
+  const tgLang = tg?.initDataUnsafe?.user?.language_code || 'ru';
+  return tgLang.startsWith('uz') ? 'uz' : 'ru';
+})();
+
+function t(key) { return LANGS[currentLang][key] || LANGS.ru[key] || key; }
+
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('csw_lang', lang);
+  applyLang();
+  renderHome();
+  renderCatalog();
+}
+
+function applyLang() {
+  // Nav labels
+  const navLabels = ['home','catalog','cart','orders','more'];
+  document.querySelectorAll('.nav-btn').forEach((btn, i) => {
+    const spans = btn.querySelectorAll('span, div');
+    // Update text node
+    const textNodes = [...btn.childNodes].filter(n => n.nodeType === 3);
+    if (textNodes.length) textNodes[textNodes.length-1].textContent = t(navLabels[i]);
+  });
+  // Flag buttons
+  const ruBtn = document.getElementById('langRU');
+  const uzBtn = document.getElementById('langUZ');
+  if (ruBtn) { ruBtn.style.opacity = currentLang === 'ru' ? '1' : '0.4'; }
+  if (uzBtn) { uzBtn.style.opacity = currentLang === 'uz' ? '1' : '0.4'; }
+}
 
 let products = [], cart = {}, currentProduct = null, selectedVariant = null, selectedSize = null, selectedPhone = null, selectedPadSize = null, selectedColor = null, activePromo = null, deliveryLocation = null, pendingOrder = null, map = null, marker = null;
 
@@ -1514,6 +1645,104 @@ function showSuccessReceipt(order) {
     `<div class="receipt-row big"><span>Итого</span><span>${money(order.total)}</span></div>` +
     `<div class="receipt-row"><span class="rl">📦 Ожидаемая дата</span><span class="rv">${deliveryDate}</span></div>`;
 }
+
+// ── ZOOM ──
+function openZoom(src) {
+  document.getElementById('zoomImg').src = src;
+  document.getElementById('zoomOverlay').classList.add('open');
+}
+function closeZoom() {
+  document.getElementById('zoomOverlay').classList.remove('open');
+}
+
+// ── SHARE PRODUCT ──
+function shareProduct() {
+  if (!currentProduct) return;
+  const text = `${currentProduct.name} — ${money(currentProduct.price)}\n\nCSWEAR UZ | CS2 мерч в Ташкенте\n👉 @CsWear_uz_bot`;
+  const btn = document.getElementById('shareBtn');
+  if (navigator.share) {
+    navigator.share({ title: currentProduct.name, text }).catch(() => {});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.classList.add('share-copied');
+      btn.textContent = '✓ Скопировано!';
+      setTimeout(() => { btn.classList.remove('share-copied'); btn.textContent = '🔗 Поделиться товаром'; }, 2000);
+    });
+  }
+}
+
+// ── CANCELLATION ──
+let cancelOrderId = null;
+
+function openDetail(orderId) {
+  const orders = window._ordersCache || [];
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+  cancelOrderId = orderId;
+  document.getElementById('dOrderId').textContent = order.id;
+  document.getElementById('dDate').textContent = 'Создан: ' + fmtTime(order.date);
+  const currentIdx = STATUS_FLOW.indexOf(order.status);
+  document.getElementById('dTimeline').innerHTML = '<div class="tl-section-title">Статус заказа</div>' +
+    STATUS_FLOW.map((status, idx) => {
+      const cfg = STATUS_CONFIG[status];
+      const tlEntry = order.timeline?.find(t => t.status === status);
+      let dc = idx < currentIdx ? 'done' : idx === currentIdx ? 'active' : 'future';
+      const isLast = idx === STATUS_FLOW.length - 1;
+      return `<div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-dot ${dc}">${dc !== 'future' ? cfg.emoji : ''}</div>
+          ${!isLast ? `<div class="tl-connector ${idx < currentIdx ? 'done' : 'future'}"></div>` : ''}
+        </div>
+        <div class="tl-content">
+          <div class="tl-label ${dc}">${cfg.label}</div>
+          <div class="tl-time ${dc !== 'future' ? 'done' : ''}">${tlEntry ? fmtTime(tlEntry.time) : (idx <= currentIdx ? fmtTime(order.date) : 'Ожидается')}</div>
+        </div>
+      </div>`;
+    }).join('');
+  document.getElementById('dItems').innerHTML =
+    '<div class="tl-section-title" style="padding-top:16px">Товары</div>' +
+    order.items.map(i => `<div class="detail-item-row"><span class="detail-item-name">${i.name}<br><small style="color:var(--hint)">${i.size}</small></span><span class="detail-item-price">${money(i.sum)}</span></div>`).join('');
+  document.getElementById('dTotal').textContent = 'Итого: ' + money(order.total);
+  const mapBtn = document.getElementById('dMapBtn');
+  if (order.mapLink) { mapBtn.href = order.mapLink; mapBtn.style.display = 'block'; } else mapBtn.style.display = 'none';
+
+  // Show cancel button only if order is pending
+  const cancelSection = document.getElementById('cancelSection');
+  if (order.status === 'pending') {
+    cancelSection.style.display = 'block';
+    document.getElementById('cancelReason').value = '';
+  } else {
+    cancelSection.style.display = 'none';
+  }
+
+  document.getElementById('detailOverlay').classList.add('open');
+}
+
+async function submitCancellation() {
+  const reason = document.getElementById('cancelReason').value.trim();
+  if (!reason) { alert('Пожалуйста, укажите причину отмены'); return; }
+  try {
+    const res = await fetch(BACKEND_URL + '/cancel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId: cancelOrderId, userId: String(USER_ID), reason })
+    });
+    const json = await res.json();
+    if (json.ok) {
+      document.getElementById('cancelSection').style.display = 'none';
+      document.getElementById('detailOverlay').classList.remove('open');
+      alert('Запрос на отмену отправлен. Ожидайте ответа.');
+      renderOrders();
+    } else {
+      alert(json.error || 'Ошибка отправки');
+    }
+  } catch(e) {
+    alert('Ошибка соединения');
+  }
+}
+
+// ── LANG INIT ──
+applyLang();
 
 fetch('products.json').then(r => r.json()).then(data => { products = data; renderHome(); renderCatalog(); });
 </script>
