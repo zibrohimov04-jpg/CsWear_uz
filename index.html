@@ -1351,17 +1351,35 @@ function filterCatalog(type, el) {
   doCatalogSearch();
 }
 
+function normalize(str) {
+  return (str || '').toLowerCase()
+    .replace(/ё/g,'е')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+
+function matchesQuery(p, q) {
+  if (!q) return true;
+  const typeLabels = { jersey: 'джерси футболка', case: 'чехол', mousepad: 'коврик ковер' };
+  const extended = normalize(
+    p.name + ' ' + (p.description||'') + ' ' + p.type + ' ' + (typeLabels[p.type]||'')
+  );
+  const words = q.split(' ').filter(Boolean);
+  // Every word must either fully match OR be a prefix of a word in the string
+  return words.every(word => {
+    if (extended.includes(word)) return true;
+    // prefix match: any token in extended starts with this word
+    return extended.split(' ').some(token => token.startsWith(word));
+  });
+}
+
 function doCatalogSearch() {
-  const q = (document.getElementById('catalogSearch')?.value || '').trim().toLowerCase();
+  const raw = document.getElementById('catalogSearch')?.value || '';
+  const q = normalize(raw);
   let filtered = activeFilter === 'all' ? products : products.filter(p => p.type === activeFilter);
-  if (q) {
-    filtered = filtered.filter(p => {
-      const str = (p.name + ' ' + (p.description||'')).toLowerCase();
-      return str.includes(q) || q.split('').every(ch => str.includes(ch));
-    });
-  }
+  if (q) filtered = filtered.filter(p => matchesQuery(p, q));
   if (!filtered.length) {
-    document.getElementById('catalogGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--hint);padding:40px 20px;font-size:14px">Ничего не найдено 🔍</div>';
+    document.getElementById('catalogGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--hint);padding:40px 20px;font-size:14px">Ничего не найдено 🔍<br><span style="font-size:12px;margin-top:8px;display:block">Попробуйте другой запрос</span></div>';
     return;
   }
   document.getElementById('catalogGrid').innerHTML = filtered.map(p => buildCard(p)).join('');
@@ -1377,16 +1395,11 @@ function setFilter(type, el) {
 }
 
 function doSearch() {
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  const typeMap = { jersey: 'джерси', case: 'чехол', mousepad: 'коврик' };
+  const raw = document.getElementById('searchInput')?.value || '';
+  const q = normalize(raw);
   let results = products.filter(p => {
     const matchType = searchFilter === 'all' || p.type === searchFilter;
-    if (!q) return matchType;
-    const searchStr = (p.name + ' ' + p.description + ' ' + (typeMap[p.type]||'')).toLowerCase();
-    // fuzzy: check if all chars of query appear in order
-    const matchName = searchStr.includes(q);
-    const matchFuzzy = q.split('').every(ch => searchStr.includes(ch));
-    return matchType && (matchName || matchFuzzy);
+    return matchType && matchesQuery(p, q);
   });
   const grid = document.getElementById('searchResults');
   const empty = document.getElementById('emptySearch');
