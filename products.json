@@ -79,7 +79,16 @@
     "photo": "chexol.jpg",
     "description": "Прозрачный чехол CS2 с автографами игроков и логотипом команды",
     "type": "case",
-    "variants": ["G2", "Team Spirit", "NAVI", "Vitality", "FaZe", "Lynn Vision", "Astralis", "MOUZ"]
+    "variants": [
+      "G2",
+      "Team Spirit",
+      "NAVI",
+      "Vitality",
+      "FaZe",
+      "Lynn Vision",
+      "Astralis",
+      "MOUZ"
+    ]
   },
   {
     "id": 10,
@@ -89,7 +98,10 @@
     "photo": "monesy chexol.jpg",
     "description": "Чехол Falcons — выбери дизайн Monesy или NiKo",
     "type": "case",
-    "variants": ["Monesy", "NiKo"]
+    "variants": [
+      "Monesy",
+      "NiKo"
+    ]
   },
   {
     "id": 11,
@@ -125,8 +137,14 @@
     "description": "Уличная футболка FaZe Clan — streetwear стиль легендарной команды",
     "type": "jersey",
     "colors": [
-      { "label": "Белый", "hex": "#FFFFFF" },
-      { "label": "Чёрный", "hex": "#1A1A1A" }
+      {
+        "label": "Белый",
+        "hex": "#FFFFFF"
+      },
+      {
+        "label": "Чёрный",
+        "hex": "#1A1A1A"
+      }
     ]
   },
   {
@@ -181,7 +199,17 @@
     "size": "S, M, L, XL",
     "photo": "g2 street t-shirt.jpg",
     "description": "G2 Esports в уличном стиле — streetwear для настоящих фанатов",
-    "type": "jersey"
+    "type": "jersey",
+    "colors": [
+      {
+        "label": "Белый",
+        "hex": "#FFFFFF"
+      },
+      {
+        "label": "Чёрный",
+        "hex": "#1A1A1A"
+      }
+    ]
   },
   {
     "id": 20,
@@ -190,7 +218,17 @@
     "size": "S, M, L, XL",
     "photo": "cs2 street jersey.jpg",
     "description": "CS2 Street — стильная уличная футболка с брендингом игры",
-    "type": "jersey"
+    "type": "jersey",
+    "colors": [
+      {
+        "label": "Белый",
+        "hex": "#FFFFFF"
+      },
+      {
+        "label": "Чёрный",
+        "hex": "#1A1A1A"
+      }
+    ]
   },
   {
     "id": 21,
@@ -217,7 +255,17 @@
     "size": "S, M, L, XL",
     "photo": "cortisol.jpg",
     "description": "Low Cortisol — stay calm, play better. Мем-культура CS2",
-    "type": "jersey"
+    "type": "jersey",
+    "colors": [
+      {
+        "label": "Белый",
+        "hex": "#FFFFFF"
+      },
+      {
+        "label": "Чёрный",
+        "hex": "#1A1A1A"
+      }
+    ]
   },
   {
     "id": 24,
@@ -228,9 +276,18 @@
     "description": "CSGO коврик для мыши — доступен в трёх цветах",
     "type": "mousepad",
     "colors": [
-      { "label": "Розовый", "hex": "#FF69B4" },
-      { "label": "Белый",   "hex": "#FFFFFF" },
-      { "label": "Чёрный",  "hex": "#1A1A1A" }
+      {
+        "label": "Розовый",
+        "hex": "#FF69B4"
+      },
+      {
+        "label": "Белый",
+        "hex": "#FFFFFF"
+      },
+      {
+        "label": "Чёрный",
+        "hex": "#1A1A1A"
+      }
     ],
     "sizePrices": {
       "60x30": 84990,
