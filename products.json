@@ -219,10 +219,6 @@
     "photo": "cortisol.jpg",
     "description": "Low Cortisol — stay calm, play better. Мем-культура CS2",
     "type": "jersey"
-    "colors": [
-      { "label": "Белый", "hex": "#FFFFFF" },
-      { "label": "Чёрный", "hex": "#1A1A1A" }
-    ]
   },
   {
     "id": 24,
