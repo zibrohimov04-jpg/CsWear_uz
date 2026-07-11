@@ -847,10 +847,13 @@ function openProduct(id) {
   }
 
   if (currentProduct.type === 'case') {
-    document.getElementById('variantSection').style.display = 'block';
-    document.getElementById('variantChips').innerHTML = currentProduct.variants.map(v =>
-      `<button class="option-chip" onclick="selectVariant('${v}', this)">${v}</button>`
-    ).join('');
+    // Variants only if product has them
+    if (currentProduct.variants && currentProduct.variants.length > 0) {
+      document.getElementById('variantSection').style.display = 'block';
+      document.getElementById('variantChips').innerHTML = currentProduct.variants.map(v =>
+        `<button class="option-chip" onclick="selectVariant('${v}', this)">${v}</button>`
+      ).join('');
+    }
     document.getElementById('phoneSection').style.display = 'block';
     const phones = currentProduct.size.split(',').map(s => s.trim());
     document.getElementById('phoneChips').innerHTML = phones.map(ph =>
@@ -936,9 +939,10 @@ function getProductKey() {
     const sizeLabel = selectedColor ? `${selectedSize} | ${selectedColor}` : selectedSize;
     return { key: `${p.id}_${selectedSize}_${selectedColor||''}`, size: sizeLabel, price: p.price };
   } else if (p.type === 'case') {
-    if (!selectedVariant) { alert('Выберите дизайн'); return null; }
+    if (p.variants && p.variants.length > 0 && !selectedVariant) { alert('Выберите дизайн'); return null; }
     if (!selectedPhone) { alert('Выберите модель телефона'); return null; }
-    return { key: `${p.id}_${selectedVariant}_${selectedPhone}`, size: `${selectedVariant} | ${selectedPhone}`, price: p.price };
+    const caseSize = selectedVariant ? `${selectedVariant} | ${selectedPhone}` : selectedPhone;
+    return { key: `${p.id}_${selectedVariant||''}_${selectedPhone}`, size: caseSize, price: p.price };
   } else if (p.type === 'mousepad') {
     if (!selectedPadSize) { alert('Выберите размер коврика'); return null; }
     if (p.colors && p.colors.length > 0 && !selectedColor) { alert('Выберите цвет'); return null; }
