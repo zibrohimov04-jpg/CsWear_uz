@@ -209,6 +209,44 @@
   .detail-total{padding:12px 18px;font-size:16px;font-weight:800;color:var(--accent);border-top:1px solid var(--line);}
   .detail-map-btn{display:block;margin:0 18px 4px;padding:11px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--accent);font-size:13px;font-weight:600;text-align:center;text-decoration:none;}
 
+  /* MORE / FAQ / SEARCH */
+  .more-btn{display:flex;align-items:center;gap:14px;width:100%;padding:16px;background:var(--card);border:1px solid var(--line);border-radius:14px;color:var(--text);font-size:15px;font-weight:600;cursor:pointer;text-align:left;}
+  .more-arrow{margin-left:auto;color:var(--hint);font-size:18px;}
+  .faq-item{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  .faq-q{padding:14px 16px;font-size:14px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+  .faq-a{display:none;padding:0 16px 14px;font-size:13px;color:var(--hint);line-height:1.6;border-top:1px solid var(--line);padding-top:12px;}
+  .faq-a.open{display:block;}
+  .filter-chip{padding:7px 14px;border-radius:20px;border:1.5px solid var(--line);background:var(--card);color:var(--hint);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;}
+  .filter-chip.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+  /* PRODUCT BADGES */
+  .product-badge{position:absolute;top:8px;left:8px;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:800;letter-spacing:.5px;z-index:2;}
+  .badge-new{background:#3DBE7A;color:#fff;}
+  .badge-hit{background:#F0A500;color:#fff;}
+  .badge-exclusive{background:#8264DC;color:#fff;}
+  .card{position:relative;}
+
+  /* PROMO BANNER */
+  .promo-banner{overflow:hidden;background:rgba(67,130,223,0.1);border-top:1px solid rgba(67,130,223,0.2);border-bottom:1px solid rgba(67,130,223,0.2);padding:10px 0;}
+  .promo-banner-text{display:inline-block;white-space:nowrap;font-size:12px;color:var(--accent);font-weight:600;animation:marquee 25s linear infinite;}
+  @keyframes marquee{from{transform:translateX(100vw)}to{transform:translateX(-100%)}}
+
+  /* HOME ACTION BTNS */
+  .home-action-btn{flex:1;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--text);font-size:13px;font-weight:600;cursor:pointer;}
+
+  /* SUMMARY / RECEIPT */
+  .summary-receipt{margin:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+  .summary-row{display:flex;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--line);font-size:13px;}
+  .summary-row:last-child{border-bottom:none;}
+  .summary-row.total{font-weight:800;font-size:15px;color:var(--accent);}
+  .summary-row .sl{color:var(--hint);}
+  .receipt-card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:14px 0;text-align:left;}
+  .receipt-row{display:flex;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--line);font-size:13px;}
+  .receipt-row:last-child{border-bottom:none;}
+  .receipt-row .rl{color:var(--hint);}
+  .receipt-row .rv{font-weight:600;}
+  .receipt-row.big{font-size:15px;font-weight:800;color:var(--accent);}
+
   .leaflet-container{background:var(--bg);}
 </style>
 </head>
@@ -503,14 +541,42 @@
     <div class="hero-tagline">Официальные джерси, чехлы и аксессуары киберспортивных команд</div>
     <button class="hero-btn" onclick="showScreen('catalog')">Смотреть коллекцию →</button>
   </div>
-  <div class="section-title">Популярные</div>
+  <!-- Promo banner -->
+  <div class="promo-banner">
+    <span class="promo-banner-text">🎁 Промокод FIRST15 — скидка 15% на первый заказ &nbsp;&nbsp;&nbsp; 🚚 Доставка 7–14 дней в Ташкент &nbsp;&nbsp;&nbsp; 💎 Более 20 товаров в каталоге &nbsp;&nbsp;&nbsp; 🎁 Промокод FIRST15 — скидка 15% на первый заказ</span>
+  </div>
+
+  <!-- Новинки -->
+  <div class="section-title">🆕 Новинки</div>
+  <div class="featured-scroll" id="newArrivalsScroll"></div>
+
+  <!-- Popular -->
+  <div class="section-title">💎 Топ выбор</div>
   <div class="featured-scroll" id="featuredScroll"></div>
-  <div style="height:16px"></div>
+
+  <!-- Recently viewed -->
+  <div id="recentSection" style="display:none">
+    <div class="section-title">👀 Недавно смотрели</div>
+    <div class="featured-scroll" id="recentScroll"></div>
+  </div>
+
+  <!-- Contact + FAQ row -->
+  <div style="display:flex;gap:10px;padding:8px 16px 20px">
+    <button class="home-action-btn" onclick="showScreen('faq')">❓ FAQ</button>
+    <button class="home-action-btn" onclick="openTelegram()">💬 Написать нам</button>
+  </div>
+  <div style="height:8px"></div>
 </div>
 
 <!-- CATALOG -->
 <div id="screen-catalog" class="screen">
   <div class="page-hd"><h2>Коллекция</h2></div>
+  <div style="padding:10px 16px 0;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none">
+    <button class="filter-chip active" id="cat-all" onclick="filterCatalog('all',this)">Все</button>
+    <button class="filter-chip" id="cat-jersey" onclick="filterCatalog('jersey',this)">👕 Джерси</button>
+    <button class="filter-chip" id="cat-case" onclick="filterCatalog('case',this)">📱 Чехлы</button>
+    <button class="filter-chip" id="cat-mousepad" onclick="filterCatalog('mousepad',this)">🖱 Коврики</button>
+  </div>
   <div class="grid" id="catalogGrid"></div>
 </div>
 
@@ -620,7 +686,7 @@
   <div id="cartItems"></div>
   <div class="cart-footer" id="cartFooter" style="display:none">
     <div class="total-row"><span class="total-label">Итого</span><span class="total-val" id="cartTotalVal"></span></div>
-    <button class="primary-btn" onclick="showScreen('checkout')">Оформить заказ →</button>
+    <button class="primary-btn" onclick="showSummary()">Перейти к оформлению →</button>
   </div>
 </div>
 
@@ -685,8 +751,9 @@
   <div class="success-wrap">
     <div class="s-icon">🎉</div>
     <h2>Заказ принят!</h2>
-    <p>Скриншот оплаты получен. После проверки статус изменится в разделе <b>«Заказы»</b>.<br><br>⏳ Срок доставки: <b style="color:var(--accent)">7–14 дней</b> с момента подтверждения оплаты.</p>
-    <button class="primary-btn" style="margin-top:24px" onclick="goHome()">На главную</button>
+    <div class="receipt-card" id="successReceipt"></div>
+    <p style="margin-top:16px">После проверки оплаты вы получите уведомление в боте. Следите за статусом в разделе «Заказы».</p>
+    <button class="primary-btn" style="margin-top:20px" onclick="goHome()">На главную</button>
     <button class="btn-outline" onclick="showScreen('orders')">Мои заказы →</button>
   </div>
 </div>
@@ -713,6 +780,83 @@
 </div>
 
 <!-- NAV -->
+
+<!-- ORDER SUMMARY -->
+<div id="screen-summary" class="screen">
+  <div class="back-row"><button class="back-btn" onclick="showScreen('cart')">← Назад</button><h2>Ваш заказ</h2></div>
+  
+  <div class="summary-receipt" id="summaryReceipt"></div>
+  <div style="padding:0 16px 24px;margin-top:16px">
+    <button class="primary-btn" onclick="showScreen('checkout')">Оформить →</button>
+  </div>
+</div>
+
+<!-- MORE SCREEN -->
+<div id="screen-more" class="screen">
+  <div class="page-hd"><h2>Ещё</h2></div>
+  <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
+    <button class="more-btn" onclick="showScreen('search')">
+      <span>🔍</span><span>Поиск товаров</span><span class="more-arrow">›</span>
+    </button>
+    <button class="more-btn" onclick="showScreen('faq')">
+      <span>❓</span><span>Частые вопросы</span><span class="more-arrow">›</span>
+    </button>
+    <button class="more-btn" onclick="openTelegram()">
+      <span>💬</span><span>Написать нам</span><span class="more-arrow">›</span>
+    </button>
+  </div>
+</div>
+
+<!-- SEARCH SCREEN -->
+<div id="screen-search" class="screen">
+  <div class="back-row"><button class="back-btn" onclick="showScreen('more')">← Назад</button><h2>Поиск</h2></div>
+  <div style="padding:12px 16px">
+    <input id="searchInput" placeholder="Джерси, чехол, коврик..." oninput="doSearch()" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--text);font-size:15px;font-family:inherit">
+  </div>
+  <div style="padding:0 16px 8px;display:flex;gap:8px;flex-wrap:wrap" id="searchFilters">
+    <button class="filter-chip active" onclick="setFilter('all',this)">Все</button>
+    <button class="filter-chip" onclick="setFilter('jersey',this)">👕 Джерси</button>
+    <button class="filter-chip" onclick="setFilter('case',this)">📱 Чехлы</button>
+    <button class="filter-chip" onclick="setFilter('mousepad',this)">🖱 Коврики</button>
+  </div>
+  <div class="grid" id="searchResults"></div>
+  <div class="empty-search" id="emptySearch" style="display:none">
+    <div style="font-size:40px;text-align:center;padding-top:40px">🔍</div>
+    <div style="text-align:center;color:var(--hint);margin-top:12px;font-size:14px">Ничего не найдено.<br>Попробуйте другой запрос.</div>
+  </div>
+</div>
+
+<!-- FAQ SCREEN -->
+<div id="screen-faq" class="screen">
+  <div class="back-row"><button class="back-btn" onclick="showScreen('more')">← Назад</button><h2>Вопросы и ответы</h2></div>
+  <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">🚚 Откуда и сколько идёт доставка? <span>▼</span></div>
+      <div class="faq-a">Товары доставляются из Китая. Срок доставки — 7–14 дней до Ташкента с момента подтверждения вашей оплаты.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">💳 Как оплатить заказ? <span>▼</span></div>
+      <div class="faq-a">После оформления заказа откроется страница с реквизитами Click и Payme. Переведите сумму и прикрепите скриншот подтверждения из приложения банка.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">📦 Как отследить мой заказ? <span>▼</span></div>
+      <div class="faq-a">В разделе «Заказы» в магазине отображаются все этапы доставки в реальном времени: подтверждение оплаты, отправка, прибытие в Ташкент и доставка.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">📐 Как выбрать размер? <span>▼</span></div>
+      <div class="faq-a">На странице каждого товара есть таблица размеров: S — до 165 см, M — 165–175 см, L — 175–185 см, XL — от 185 см. Если сомневаетесь — берите на размер больше.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">🎁 Можно ли заказать на подарок? <span>▼</span></div>
+      <div class="faq-a">Конечно! Просто укажите адрес получателя при оформлении заказа. Если хотите — напишите нам и мы постараемся упаковать товар красиво.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">↩️ Можно ли вернуть товар? <span>▼</span></div>
+      <div class="faq-a">Мы гарантируем, что вы получите именно тот товар и размер, который заказали. Возврат товара не предусмотрен, поэтому внимательно выбирайте размер перед заказом.</div>
+    </div>
+  </div>
+</div>
+
 <nav class="nav">
   <button class="nav-btn active" id="nav-home" onclick="showScreen('home')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Главная
@@ -728,6 +872,9 @@
   </button>
   <button class="nav-btn" id="nav-orders" onclick="showScreen('orders')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Заказы
+  </button>
+  <button class="nav-btn" id="nav-more" onclick="showScreen('more')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>Ещё
   </button>
 </nav>
 
@@ -783,11 +930,19 @@ function fmtTime(iso) {
 
 // ── HOME ──
 function renderHome() {
-  document.getElementById('featuredScroll').innerHTML = products.slice(0,6).map(p =>
-    `<div class="featured-card" onclick="openProduct(${p.id})">
-      <img src="${p.photo}" alt="${p.name}" loading="lazy">
-      <div class="featured-card-body"><div class="fc-name">${p.name}</div><div class="fc-price">${money(p.price)}</div></div>
-    </div>`).join('');
+  const featCard = p => `<div class="featured-card" onclick="openProduct(${p.id})">
+    <img src="${p.photo}" alt="${p.name}" loading="lazy">
+    <div class="featured-card-body"><div class="fc-name">${p.name}</div><div class="fc-price">${money(p.price)}</div></div>
+  </div>`;
+  // Popular — products with badge:'hit' or first 5
+  const popular = products.filter(p => p.badge === 'hit').length > 0
+    ? products.filter(p => p.badge === 'hit')
+    : products.slice(0, 5);
+  document.getElementById('featuredScroll').innerHTML = popular.map(featCard).join('');
+  // New arrivals — last 4-5 by id
+  const sorted = [...products].sort((a,b) => b.id - a.id).slice(0,5);
+  document.getElementById('newArrivalsScroll').innerHTML = sorted.map(featCard).join('');
+  renderRecent();
 }
 
 // ── CATALOG ──
@@ -818,6 +973,7 @@ function toggleDetails() {
 function openProduct(id) {
   currentProduct = products.find(p => p.id == id);
   if (!currentProduct) return;
+  addToRecent(id);
   selectedVariant = null; selectedSize = null; selectedPhone = null; selectedPadSize = null;
 
   document.getElementById('productPageImg').src = currentProduct.photo;
@@ -1098,6 +1254,7 @@ async function confirmPayment() {
     const json = await res.json();
     if (!json.ok) throw new Error(json.error);
     document.getElementById('sendingOverlay').classList.remove('show');
+    showSuccessReceipt(pendingOrder);
     showScreen('success');
   } catch(e) { document.getElementById('sendingOverlay').classList.remove('show'); alert('Ошибка: ' + e.message); }
 }
@@ -1161,6 +1318,142 @@ function openDetail(orderId) {
   document.getElementById('detailOverlay').classList.add('open');
 }
 function closeDetail(e) { if (e.target === document.getElementById('detailOverlay')) document.getElementById('detailOverlay').classList.remove('open'); }
+
+// ── RECENTLY VIEWED ──
+let recentlyViewed = JSON.parse(localStorage.getItem('csw_recent') || '[]');
+
+function addToRecent(id) {
+  recentlyViewed = [id, ...recentlyViewed.filter(x => x !== id)].slice(0, 5);
+  localStorage.setItem('csw_recent', JSON.stringify(recentlyViewed));
+}
+
+function renderRecent() {
+  const recent = recentlyViewed.map(id => products.find(p => p.id == id)).filter(Boolean);
+  const sec = document.getElementById('recentSection');
+  if (!recent.length) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  document.getElementById('recentScroll').innerHTML = recent.map(p =>
+    `<div class="featured-card" onclick="openProduct(${p.id})">
+      <img src="${p.photo}" alt="${p.name}" loading="lazy">
+      <div class="featured-card-body"><div class="fc-name">${p.name}</div><div class="fc-price">${money(p.price)}</div></div>
+    </div>`).join('');
+}
+
+// ── CATALOG FILTER ──
+let activeFilter = 'all';
+function filterCatalog(type, el) {
+  activeFilter = type;
+  document.querySelectorAll('#screen-catalog .filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderCatalog();
+}
+
+// ── SEARCH ──
+let searchFilter = 'all';
+function setFilter(type, el) {
+  searchFilter = type;
+  document.querySelectorAll('#searchFilters .filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  doSearch();
+}
+
+function doSearch() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const typeMap = { jersey: 'джерси', case: 'чехол', mousepad: 'коврик' };
+  let results = products.filter(p => {
+    const matchType = searchFilter === 'all' || p.type === searchFilter;
+    if (!q) return matchType;
+    const searchStr = (p.name + ' ' + p.description + ' ' + (typeMap[p.type]||'')).toLowerCase();
+    // fuzzy: check if all chars of query appear in order
+    const matchName = searchStr.includes(q);
+    const matchFuzzy = q.split('').every(ch => searchStr.includes(ch));
+    return matchType && (matchName || matchFuzzy);
+  });
+  const grid = document.getElementById('searchResults');
+  const empty = document.getElementById('emptySearch');
+  if (!results.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = results.map(p => buildCard(p)).join('');
+}
+
+// ── FAQ ──
+function toggleFaq(el) {
+  const ans = el.nextElementSibling;
+  const arrow = el.querySelector('span:last-child');
+  const open = ans.classList.toggle('open');
+  arrow.textContent = open ? '▲' : '▼';
+}
+
+// ── CONTACT ──
+function openTelegram() {
+  window.open('https://t.me/cswear_uz_admin', '_blank');
+}
+
+// ── BADGE HELPER ──
+function getBadge(p) {
+  if (p.badge === 'new') return '<span class="product-badge badge-new">NEW</span>';
+  if (p.badge === 'hit') return '<span class="product-badge badge-hit">💎 ТОП</span>';
+  if (p.badge === 'exclusive') return '<span class="product-badge badge-exclusive">ЭКСКЛЮЗИВ</span>';
+  return '';
+}
+
+// ── CARD BUILDER (shared) ──
+function buildCard(p) {
+  const tag = p.type === 'case' ? '📱 Чехол' : p.type === 'mousepad' ? '🖱 Коврик' : '👕 Джерси';
+  const priceLabel = p.type === 'mousepad' ? 'от ' + money(p.price) : money(p.price);
+  return `<div class="card" onclick="openProduct(${p.id})">
+    ${getBadge(p)}
+    <img src="${p.photo}" alt="${p.name}" loading="lazy">
+    <div class="card-body">
+      <div class="card-name">${p.name}</div>
+      <div class="card-price">${priceLabel}</div>
+      <div class="card-tag">${tag}</div>
+    </div>
+  </div>`;
+}
+
+// ── ESTIMATED DELIVERY DATE ──
+function deliveryDateRange() {
+  const now = new Date();
+  const from = new Date(now); from.setDate(from.getDate() + 7);
+  const to = new Date(now); to.setDate(to.getDate() + 14);
+  const months = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+  const fmt = d => `${d.getDate()} ${months[d.getMonth()]}`;
+  return `${fmt(from)} — ${fmt(to)}`;
+}
+
+// ── ORDER SUMMARY ──
+function showSummary() {
+  const keys = Object.keys(cart);
+  const items = keys.map(k => cart[k]);
+  let subtotal = items.reduce((s,{product:p,qty}) => s + p.price*qty, 0);
+  let discount = 0;
+  if (activePromo) { discount = Math.round(subtotal * activePromo.discount / 100); }
+  const total = subtotal - discount;
+
+  let html = items.map(({product:p,size,qty}) =>
+    `<div class="summary-row"><span class="sl">${p.name} [${size}] ×${qty}</span><span>${money(p.price*qty)}</span></div>`
+  ).join('');
+  if (discount > 0) html += `<div class="summary-row"><span class="sl">Промокод (${activePromo.code})</span><span style="color:var(--success)">−${money(discount)}</span></div>`;
+  html += `<div class="summary-row total"><span>Итого</span><span>${money(total)}</span></div>`;
+  html += `<div class="summary-row"><span class="sl">📦 Ожидаемая доставка</span><span>${deliveryDateRange()}</span></div>`;
+
+  document.getElementById('summaryReceipt').innerHTML = `<div class="summary-receipt">${html}</div>`;
+  showScreen('summary');
+}
+
+// ── SUCCESS RECEIPT ──
+function showSuccessReceipt(order) {
+  const deliveryDate = deliveryDateRange();
+  const itemsHtml = order.items.map(i =>
+    `<div class="receipt-row"><span class="rl">${i.name} [${i.size}] ×${i.qty}</span><span class="rv">${money(i.sum)}</span></div>`
+  ).join('');
+  document.getElementById('successReceipt').innerHTML =
+    `<div class="receipt-row"><span class="rl">Номер заказа</span><span class="rv" style="color:var(--accent)">${order.id}</span></div>` +
+    itemsHtml +
+    `<div class="receipt-row big"><span>Итого</span><span>${money(order.total)}</span></div>` +
+    `<div class="receipt-row"><span class="rl">📦 Ожидаемая дата</span><span class="rv">${deliveryDate}</span></div>`;
+}
 
 fetch('products.json').then(r => r.json()).then(data => { products = data; renderHome(); renderCatalog(); });
 </script>
