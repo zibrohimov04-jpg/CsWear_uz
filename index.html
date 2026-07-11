@@ -543,7 +543,7 @@
   </div>
   <!-- Promo banner -->
   <div class="promo-banner">
-    <span class="promo-banner-text">🎁 Промокод FIRST15 — скидка 15% на первый заказ &nbsp;&nbsp;&nbsp; 🚚 Доставка 7–14 дней в Ташкент &nbsp;&nbsp;&nbsp; 💎 Более 20 товаров в каталоге &nbsp;&nbsp;&nbsp; 🎁 Промокод FIRST15 — скидка 15% на первый заказ</span>
+    <span class="promo-banner-text">🚚 Доставка 7–14 дней в Ташкент &nbsp;&nbsp;&nbsp; 💎 Более 20 товаров в каталоге &nbsp;&nbsp;&nbsp; 🎮 Официальный CS2 мерч &nbsp;&nbsp;&nbsp; 📦 Отслеживание заказа в реальном времени &nbsp;&nbsp;&nbsp; 🚚 Доставка 7–14 дней в Ташкент</span>
   </div>
 
   <!-- Новинки -->
@@ -571,11 +571,14 @@
 <!-- CATALOG -->
 <div id="screen-catalog" class="screen">
   <div class="page-hd"><h2>Коллекция</h2></div>
-  <div style="padding:10px 16px 0;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none">
-    <button class="filter-chip active" id="cat-all" onclick="filterCatalog('all',this)">Все</button>
-    <button class="filter-chip" id="cat-jersey" onclick="filterCatalog('jersey',this)">👕 Джерси</button>
-    <button class="filter-chip" id="cat-case" onclick="filterCatalog('case',this)">📱 Чехлы</button>
-    <button class="filter-chip" id="cat-mousepad" onclick="filterCatalog('mousepad',this)">🖱 Коврики</button>
+  <div style="padding:10px 16px 6px">
+    <input id="catalogSearch" placeholder="🔍 Поиск в коллекции..." oninput="doCatalogSearch()" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 14px;color:var(--text);font-size:14px;font-family:inherit">
+  </div>
+  <div style="padding:0 16px 10px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch">
+    <button class="filter-chip active" onclick="filterCatalog('all',this)">Все</button>
+    <button class="filter-chip" onclick="filterCatalog('jersey',this)">👕 Джерси</button>
+    <button class="filter-chip" onclick="filterCatalog('case',this)">📱 Чехлы</button>
+    <button class="filter-chip" onclick="filterCatalog('mousepad',this)">🖱 Коврики</button>
   </div>
   <div class="grid" id="catalogGrid"></div>
 </div>
@@ -1345,7 +1348,23 @@ function filterCatalog(type, el) {
   activeFilter = type;
   document.querySelectorAll('#screen-catalog .filter-chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
-  renderCatalog();
+  doCatalogSearch();
+}
+
+function doCatalogSearch() {
+  const q = (document.getElementById('catalogSearch')?.value || '').trim().toLowerCase();
+  let filtered = activeFilter === 'all' ? products : products.filter(p => p.type === activeFilter);
+  if (q) {
+    filtered = filtered.filter(p => {
+      const str = (p.name + ' ' + (p.description||'')).toLowerCase();
+      return str.includes(q) || q.split('').every(ch => str.includes(ch));
+    });
+  }
+  if (!filtered.length) {
+    document.getElementById('catalogGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--hint);padding:40px 20px;font-size:14px">Ничего не найдено 🔍</div>';
+    return;
+  }
+  document.getElementById('catalogGrid').innerHTML = filtered.map(p => buildCard(p)).join('');
 }
 
 // ── SEARCH ──
