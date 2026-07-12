@@ -1073,22 +1073,26 @@ function openProduct(id) {
 
   if (currentProduct.type === 'mousepad') {
     document.getElementById('padSection').style.display = 'block';
-    document.getElementById('padChips').innerHTML = Object.entries(currentProduct.sizePrices).map(([size, price]) =>
-      `<button class="option-chip price-chip" onclick="selectPad('${size}', ${price}, this)">
-        <span class="chip-size">${size} см</span>
+    document.getElementById('padChips').innerHTML = Object.entries(currentProduct.sizePrices).map(([size, price]) => {
+      const existing = Object.entries(cart).find(([k]) => k.startsWith(`${currentProduct.id}_${size}`));
+      const qtyHint = existing ? ` <span style="font-size:10px;opacity:0.8">(${existing[1].qty})</span>` : '';
+      return `<button class="option-chip price-chip" onclick="selectPad('${size}', ${price}, this)">
+        <span class="chip-size">${size} см${qtyHint}</span>
         <span class="chip-price">${money(price)}</span>
-      </button>`
-    ).join('');
+      </button>`;
+    }).join('');
   }
 
   if (currentProduct.type === 'flag') {
     document.getElementById('flagSection').style.display = 'block';
-    document.getElementById('flagChips').innerHTML = Object.entries(currentProduct.sizePrices).map(([size, price]) =>
-      `<button class="option-chip price-chip" onclick="selectFlag('${size}', ${price}, this)">
-        <span class="chip-size">${size} см</span>
+    document.getElementById('flagChips').innerHTML = Object.entries(currentProduct.sizePrices).map(([size, price]) => {
+      const existing = Object.entries(cart).find(([k]) => k.startsWith(`${currentProduct.id}_${size}`));
+      const qtyHint = existing ? ` <span style="font-size:10px;opacity:0.8">(${existing[1].qty})</span>` : '';
+      return `<button class="option-chip price-chip" onclick="selectFlag('${size}', ${price}, this)">
+        <span class="chip-size">${size} см${qtyHint}</span>
         <span class="chip-price">${money(price)}</span>
-      </button>`
-    ).join('');
+      </button>`;
+    }).join('');
   }
 
   // Color swatches (for jerseys and mousepads with colors)
@@ -1153,6 +1157,7 @@ function selectPad(size, price, el) {
   document.getElementById('stickyPrice').textContent = money(price);
   document.querySelectorAll('#padChips .option-chip').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
+  updateCounterState();
 }
 
 function selectFlag(size, price, el) {
@@ -1161,6 +1166,7 @@ function selectFlag(size, price, el) {
   document.getElementById('stickyPrice').textContent = money(price);
   document.querySelectorAll('#flagChips .option-chip').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
+  updateCounterState();
 }
 
 function selectColor(label, el) {
@@ -1173,12 +1179,18 @@ function selectColor(label, el) {
 let currentCartKey = null;
 
 function updateCounterState() {
-  // After any selection change, check if current combo is in cart
-  const info = getProductKey();
-  if (info && cart[info.key]) {
-    currentCartKey = info.key;
-    showCounter(cart[info.key].qty);
-  } else {
+  // Works for ALL product types - check if current selection is already in cart
+  try {
+    const info = getProductKey();
+    if (info && cart[info.key]) {
+      currentCartKey = info.key;
+      showCounter(cart[info.key].qty);
+    } else {
+      hideCounter();
+      currentCartKey = null;
+    }
+  } catch(e) {
+    // Selection incomplete - just hide counter
     hideCounter();
     currentCartKey = null;
   }
