@@ -594,6 +594,7 @@
     <button class="filter-chip" onclick="filterCatalog('jersey',this)">👕 Джерси</button>
     <button class="filter-chip" onclick="filterCatalog('case',this)">📱 Чехлы</button>
     <button class="filter-chip" onclick="filterCatalog('mousepad',this)">🖱 Коврики</button>
+    <button class="filter-chip" onclick="filterCatalog('flag',this)">🚩 Флаги</button>
   </div>
   <div class="grid" id="catalogGrid"></div>
 </div>
@@ -655,6 +656,12 @@
     <div class="option-section" id="phoneSection" style="display:none">
       <div class="option-label">📱 Модель телефона</div>
       <div class="option-chips" id="phoneChips"></div>
+    </div>
+
+    <!-- Flag sizes -->
+    <div class="option-section" id="flagSection" style="display:none">
+      <div class="option-label">📐 Размер флага</div>
+      <div class="option-chips" id="flagChips"></div>
     </div>
 
     <!-- Color variants -->
@@ -848,6 +855,7 @@
     <button class="filter-chip" onclick="setFilter('jersey',this)">👕 Джерси</button>
     <button class="filter-chip" onclick="setFilter('case',this)">📱 Чехлы</button>
     <button class="filter-chip" onclick="setFilter('mousepad',this)">🖱 Коврики</button>
+    <button class="filter-chip" onclick="setFilter('flag',this)">🚩 Флаги</button>
   </div>
   <div class="grid" id="searchResults"></div>
   <div class="empty-search" id="emptySearch" style="display:none">
@@ -944,7 +952,7 @@ const USER_ID = tg?.initDataUnsafe?.user?.id
   || (() => { const id = 'u' + Date.now(); localStorage.setItem('csw_uid', id); return id; })();
 
 
-let products = [], cart = {}, currentProduct = null, selectedVariant = null, selectedSize = null, selectedPhone = null, selectedPadSize = null, selectedColor = null, activePromo = null, deliveryLocation = null, pendingOrder = null, map = null, marker = null;
+let products = [], cart = {}, currentProduct = null, selectedVariant = null, selectedSize = null, selectedPhone = null, selectedPadSize = null, selectedColor = null, selectedFlagSize = null, activePromo = null, deliveryLocation = null, pendingOrder = null, map = null, marker = null;
 
 function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -983,8 +991,8 @@ function renderHome() {
 // ── CATALOG ──
 function renderCatalog() {
   document.getElementById('catalogGrid').innerHTML = products.map(p => {
-    const tag = p.type === 'case' ? '📱 Чехол' : p.type === 'mousepad' ? '🖱 Коврик' : '👕 Джерси';
-    const priceLabel = p.type === 'mousepad' ? 'от ' + money(p.price) : money(p.price);
+    const tag = p.type === 'case' ? '📱 Чехол' : p.type === 'mousepad' ? '🖱 Коврик' : p.type === 'flag' ? '🚩 Флаг' : '👕 Джерси';
+    const priceLabel = (p.type === 'mousepad' || p.type === 'flag') ? 'от ' + money(p.price) : money(p.price);
     return `<div class="card" onclick="openProduct(${p.id})">
       <img src="${p.photo}" alt="${p.name}" loading="lazy">
       <div class="card-body">
@@ -1031,8 +1039,8 @@ function openProduct(id) {
   }
 
   // Reset all option sections
-  selectedColor = null;
-  ['variantSection','sizeSection','padSection','phoneSection','colorSection'].forEach(sid => {
+  selectedColor = null; selectedFlagSize = null;
+  ['variantSection','sizeSection','padSection','phoneSection','colorSection','flagSection'].forEach(sid => {
     document.getElementById(sid).style.display = 'none';
   });
 
@@ -1067,6 +1075,16 @@ function openProduct(id) {
     document.getElementById('padSection').style.display = 'block';
     document.getElementById('padChips').innerHTML = Object.entries(currentProduct.sizePrices).map(([size, price]) =>
       `<button class="option-chip price-chip" onclick="selectPad('${size}', ${price}, this)">
+        <span class="chip-size">${size} см</span>
+        <span class="chip-price">${money(price)}</span>
+      </button>`
+    ).join('');
+  }
+
+  if (currentProduct.type === 'flag') {
+    document.getElementById('flagSection').style.display = 'block';
+    document.getElementById('flagChips').innerHTML = Object.entries(currentProduct.sizePrices).map(([size, price]) =>
+      `<button class="option-chip price-chip" onclick="selectFlag('${size}', ${price}, this)">
         <span class="chip-size">${size} см</span>
         <span class="chip-price">${money(price)}</span>
       </button>`
@@ -1137,6 +1155,14 @@ function selectPad(size, price, el) {
   el.classList.add('selected');
 }
 
+function selectFlag(size, price, el) {
+  selectedFlagSize = size;
+  document.getElementById('productPagePrice').textContent = money(price);
+  document.getElementById('stickyPrice').textContent = money(price);
+  document.querySelectorAll('#flagChips .option-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
 function selectColor(label, el) {
   selectedColor = label;
   document.querySelectorAll('#colorChips .color-chip').forEach(c => c.classList.remove('selected'));
@@ -1175,6 +1201,9 @@ function getProductKey() {
     if (p.colors && p.colors.length > 0 && !selectedColor) { alert('Выберите цвет'); return null; }
     const padLabel = selectedColor ? `${selectedPadSize} см | ${selectedColor}` : `${selectedPadSize} см`;
     return { key: `${p.id}_${selectedPadSize}_${selectedColor||''}`, size: padLabel, price: p.sizePrices[selectedPadSize] };
+  } else if (p.type === 'flag') {
+    if (!selectedFlagSize) { alert('Выберите размер флага'); return null; }
+    return { key: `${p.id}_${selectedFlagSize}`, size: `${selectedFlagSize} см`, price: p.sizePrices[selectedFlagSize] };
   }
   return null;
 }
@@ -1397,7 +1426,7 @@ function normalize(str) {
 
 function matchesQuery(p, q) {
   if (!q) return true;
-  const typeLabels = { jersey: 'джерси футболка', case: 'чехол', mousepad: 'коврик ковер' };
+  const typeLabels = { jersey: 'джерси футболка', case: 'чехол', mousepad: 'коврик ковер', flag: 'флаг' };
   const extended = normalize(
     p.name + ' ' + (p.description||'') + ' ' + p.type + ' ' + (typeLabels[p.type]||'')
   );
@@ -1468,8 +1497,8 @@ function getBadge(p) {
 
 // ── CARD BUILDER (shared) ──
 function buildCard(p) {
-  const tag = p.type === 'case' ? '📱 Чехол' : p.type === 'mousepad' ? '🖱 Коврик' : '👕 Джерси';
-  const priceLabel = p.type === 'mousepad' ? 'от ' + money(p.price) : money(p.price);
+  const tag = p.type === 'case' ? '📱 Чехол' : p.type === 'mousepad' ? '🖱 Коврик' : p.type === 'flag' ? '🚩 Флаг' : '👕 Джерси';
+  const priceLabel = (p.type === 'mousepad' || p.type === 'flag') ? 'от ' + money(p.price) : money(p.price);
   return `<div class="card" onclick="openProduct(${p.id})">
     ${getBadge(p)}
     <img src="${p.photo}" alt="${p.name}" loading="lazy">
