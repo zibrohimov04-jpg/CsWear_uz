@@ -1305,7 +1305,7 @@ async function applyPromo() {
   const msg = document.getElementById('promoMsg');
   if (!code) return;
   try {
-    const res = await fetch(BACKEND_URL + '/promo', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({code}) });
+    const res = await fetch(BACKEND_URL + '/promo', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({code, userId: String(USER_ID)}) });
     const json = await res.json();
     if (json.ok) { activePromo = { code, discount: json.discount }; msg.className = 'promo-msg ok'; msg.textContent = `✓ Промокод применён! Скидка ${json.discount}%`; }
     else { activePromo = null; msg.className = 'promo-msg err'; msg.textContent = '✗ ' + json.error; }
