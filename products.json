@@ -301,7 +301,7 @@
     "name": "Falcons Track Jacket",
     "price": 229000,
     "size": "S, M, L, XL",
-    "photo": "Team Falcon spartivka.jpg",
+    "photo": "Team_Falcon_spartivka.jpg",
     "description": "Официальная спортивная куртка Team Falcons — лёгкая, стильная, с фирменными цветами команды",
     "type": "jersey"
   },
@@ -310,7 +310,7 @@
     "name": "NAVI Flag",
     "price": 119000,
     "size": "100x70, 150x100, 150x130, 200x150",
-    "photo": "navi flag.jpg",
+    "photo": "navi_flag.jpg",
     "description": "Официальный флаг NAVI — Natus Vincere. Украсит комнату любого фаната",
     "type": "flag",
     "sizePrices": {
@@ -325,7 +325,7 @@
     "name": "Dizzy Phone Case",
     "price": 89000,
     "size": "iPhone 12, iPhone 12 Pro, iPhone 12 Pro Max, iPhone 13, iPhone 13 Pro, iPhone 13 Pro Max, iPhone 14, iPhone 14 Pro, iPhone 14 Pro Max, iPhone 15, iPhone 15 Pro, iPhone 15 Pro Max",
-    "photo": "dizzy case.jpg",
+    "photo": "dizzy_case.jpg",
     "description": "Чехол с аниме-персонажем в стиле CS2 — яркий и необычный дизайн",
     "type": "case"
   },
@@ -334,7 +334,7 @@
     "name": "Gaming Arm Sleeves",
     "price": 89000,
     "size": "One Size",
-    "photo": "thing that u wear on hands for gaming.jpg",
+    "photo": "thing_that_u_wear_on_hands_for_gaming.jpg",
     "description": "Компрессионные рукава для геймеров — уменьшают усталость рук, улучшают точность движений во время долгих игровых сессий",
     "type": "jersey"
   },
@@ -343,7 +343,7 @@
     "name": "FaZe Clan Flag",
     "price": 119000,
     "size": "100x70, 150x100, 150x130, 200x150",
-    "photo": "Faze flag.jpg",
+    "photo": "Faze_flag.jpg",
     "description": "Официальный флаг FaZe Clan — чёрно-белый минималистичный дизайн",
     "type": "flag",
     "sizePrices": {
@@ -358,7 +358,7 @@
     "name": "G2 Esports Flag",
     "price": 119000,
     "size": "100x70, 150x100, 150x130, 200x150",
-    "photo": "G2 flag.jpg",
+    "photo": "G2_flag.jpg",
     "description": "Официальный флаг G2 Esports — тёмный фон с культовым логотипом команды",
     "type": "flag",
     "sizePrices": {
@@ -367,5 +367,113 @@
       "150x130": 209000,
       "200x150": 239000
     }
+  },
+  {
+    "id": 31,
+    "name": "CS2 Teams Pillow",
+    "price": 69000,
+    "size": "40x40 см",
+    "photo": "podushka.jpg",
+    "description": "Подушка с логотипом любимой CS2 команды — идеальный подарок фанату",
+    "type": "pillow",
+    "variants": [
+      "Falcons",
+      "FaZe",
+      "G2",
+      "Vitality",
+      "NAVI",
+      "Team Spirit"
+    ]
+  },
+  {
+    "id": 32,
+    "name": "Vitality Form 2025",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "Vitality 2025.jpg",
+    "description": "Официальная форма Team Vitality 2025 — V for Victory",
+    "type": "jersey"
+  },
+  {
+    "id": 33,
+    "name": "CS2 Plush Doll",
+    "price": 349000,
+    "size": "One Size",
+    "photo": "doll cs2.jpg",
+    "description": "Мягкая игрушка CS2 — культовый персонаж в противогазе и броне. Идеальный подарок!",
+    "type": "toy"
+  },
+  {
+    "id": 34,
+    "name": "Falcons Street T-Shirt",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "Street t-shirt falcons.jpg",
+    "description": "Уличная футболка Team Falcons — минималистичный логотип на чистом фоне",
+    "type": "jersey",
+    "colors": [
+      {
+        "label": "Чёрный",
+        "hex": "#1A1A1A"
+      },
+      {
+        "label": "Белый",
+        "hex": "#FFFFFF"
+      }
+    ]
+  },
+  {
+    "id": 35,
+    "name": "G2 Esports 2026 Jersey",
+    "price": 249000,
+    "size": "S, M, L, XL",
+    "photo": "G2 2026.jpg",
+    "description": "Официальная джерси G2 Esports 2026 — красно-чёрный стиль легендарной команды",
+    "type": "jersey"
+  },
+  {
+    "id": 36,
+    "name": "Vitality Street Jersey",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "vitality street jersey.jpg",
+    "description": "Уличная футболка Team Vitality с граффити-принтом — streetwear стиль",
+    "type": "jersey",
+    "colors": [
+      {
+        "label": "Синий",
+        "hex": "#1B2A6B"
+      },
+      {
+        "label": "Белый",
+        "hex": "#FFFFFF"
+      },
+      {
+        "label": "Чёрный",
+        "hex": "#1A1A1A"
+      },
+      {
+        "label": "Жёлтый",
+        "hex": "#F5C518"
+      }
+    ]
+  },
+  {
+    "id": 37,
+    "name": "Parivision Jersey",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "Parivison.jpg",
+    "description": "Официальная джерси Parivision — чёрный с бирюзовым акцентом",
+    "type": "jersey"
+  },
+  {
+    "id": 38,
+    "name": "Team Liquid 2025 Jersey",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "Team liquid 2025.jpg",
+    "description": "Официальная джерси Team Liquid 2025 — глубокий синий с волновым принтом Alienware",
+    "type": "jersey"
   }
 ]
