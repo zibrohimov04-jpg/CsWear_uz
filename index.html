@@ -595,6 +595,7 @@
     <button class="filter-chip" onclick="filterCatalog('case',this)">📱 Чехлы</button>
     <button class="filter-chip" onclick="filterCatalog('mousepad',this)">🖱 Коврики</button>
     <button class="filter-chip" onclick="filterCatalog('flag',this)">🚩 Флаги</button>
+    <button class="filter-chip" onclick="filterCatalog('pillow',this)">🛋 Подушки</button>
   </div>
   <div class="grid" id="catalogGrid"></div>
 </div>
@@ -856,6 +857,7 @@
     <button class="filter-chip" onclick="setFilter('case',this)">📱 Чехлы</button>
     <button class="filter-chip" onclick="setFilter('mousepad',this)">🖱 Коврики</button>
     <button class="filter-chip" onclick="setFilter('flag',this)">🚩 Флаги</button>
+    <button class="filter-chip" onclick="setFilter('pillow',this)">🛋 Подушки</button>
   </div>
   <div class="grid" id="searchResults"></div>
   <div class="empty-search" id="emptySearch" style="display:none">
@@ -991,7 +993,7 @@ function renderHome() {
 // ── CATALOG ──
 function renderCatalog() {
   document.getElementById('catalogGrid').innerHTML = products.map(p => {
-    const tag = p.type === 'case' ? '📱 Чехол' : p.type === 'mousepad' ? '🖱 Коврик' : p.type === 'flag' ? '🚩 Флаг' : '👕 Джерси';
+    const tag = p.type === 'case' ? '📱 Чехол' : p.type === 'mousepad' ? '🖱 Коврик' : p.type === 'flag' ? '🚩 Флаг' : p.type === 'pillow' ? '🛋 Подушка' : p.type === 'toy' ? '🧸 Игрушка' : '👕 Джерси';
     const priceLabel = (p.type === 'mousepad' || p.type === 'flag') ? 'от ' + money(p.price) : money(p.price);
     return `<div class="card" onclick="openProduct(${p.id})">
       <img src="${p.photo}" alt="${p.name}" loading="lazy">
@@ -1081,6 +1083,13 @@ function openProduct(id) {
         <span class="chip-price">${money(price)}</span>
       </button>`;
     }).join('');
+  }
+
+  if (currentProduct.type === 'pillow') {
+    document.getElementById('variantSection').style.display = 'block';
+    document.getElementById('variantChips').innerHTML = (currentProduct.variants || []).map(v =>
+      `<button class="option-chip" onclick="selectVariant('${v}', this)">${v}</button>`
+    ).join('');
   }
 
   if (currentProduct.type === 'flag') {
@@ -1203,6 +1212,11 @@ function getProductKey() {
     if (p.colors && p.colors.length > 0 && !selectedColor) { alert('Выберите цвет'); return null; }
     const sizeLabel = selectedColor ? `${selectedSize} | ${selectedColor}` : selectedSize;
     return { key: `${p.id}_${selectedSize}_${selectedColor||''}`, size: sizeLabel, price: p.price };
+  } else if (p.type === 'pillow') {
+    if (!selectedVariant) { alert('Выберите команду'); return null; }
+    return { key: `${p.id}_${selectedVariant}`, size: selectedVariant, price: p.price };
+  } else if (p.type === 'toy') {
+    return { key: `${p.id}_one`, size: 'One Size', price: p.price };
   } else if (p.type === 'case') {
     if (p.variants && p.variants.length > 0 && !selectedVariant) { alert('Выберите дизайн'); return null; }
     if (!selectedPhone) { alert('Выберите модель телефона'); return null; }
@@ -1438,7 +1452,7 @@ function normalize(str) {
 
 function matchesQuery(p, q) {
   if (!q) return true;
-  const typeLabels = { jersey: 'джерси футболка', case: 'чехол', mousepad: 'коврик ковер', flag: 'флаг' };
+  const typeLabels = { jersey: 'джерси футболка', case: 'чехол', mousepad: 'коврик ковер', flag: 'флаг', pillow: 'подушка', toy: 'игрушка мягкая' };
   const extended = normalize(
     p.name + ' ' + (p.description||'') + ' ' + p.type + ' ' + (typeLabels[p.type]||'')
   );
@@ -1509,7 +1523,7 @@ function getBadge(p) {
 
 // ── CARD BUILDER (shared) ──
 function buildCard(p) {
-  const tag = p.type === 'case' ? '📱 Чехол' : p.type === 'mousepad' ? '🖱 Коврик' : p.type === 'flag' ? '🚩 Флаг' : '👕 Джерси';
+  const tag = p.type === 'case' ? '📱 Чехол' : p.type === 'mousepad' ? '🖱 Коврик' : p.type === 'flag' ? '🚩 Флаг' : p.type === 'pillow' ? '🛋 Подушка' : p.type === 'toy' ? '🧸 Игрушка' : '👕 Джерси';
   const priceLabel = (p.type === 'mousepad' || p.type === 'flag') ? 'от ' + money(p.price) : money(p.price);
   return `<div class="card" onclick="openProduct(${p.id})">
     ${getBadge(p)}
