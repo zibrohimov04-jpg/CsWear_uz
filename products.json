@@ -475,5 +475,139 @@
     "photo": "Team liquid 2025.jpg",
     "description": "Официальная джерси Team Liquid 2025 — глубокий синий с волновым принтом Alienware",
     "type": "jersey"
+  },
+  {
+    "id": 39,
+    "name": "Navi 2026 Jersey",
+    "price": 249000,
+    "size": "S, M, L, XL",
+    "photo": "Navi jersey 2026.jpg",
+    "description": "Новая официальная джерси NAVI — свежий дизайн сезона 2026",
+    "type": "jersey"
+  },
+  {
+    "id": 40,
+    "name": "Tactical Operator Phone Case",
+    "price": 89000,
+    "size": "iPhone 12, iPhone 12 Pro, iPhone 12 Pro Max, iPhone 13, iPhone 13 Pro, iPhone 13 Pro Max, iPhone 14, iPhone 14 Pro, iPhone 14 Pro Max, iPhone 15, iPhone 15 Pro, iPhone 15 Pro Max, iPhone 16, iPhone 16 Pro, iPhone 16 Pro Max",
+    "photo": "cs2 agent chexol.jpg",
+    "description": "Чехол с CS2 агентом спецназа в противогазе — тактический дизайн",
+    "type": "case",
+    "colors": [
+      {
+        "label": "Белый",
+        "hex": "#FFFFFF"
+      },
+      {
+        "label": "Бежевый",
+        "hex": "#E8DCC8"
+      },
+      {
+        "label": "Чёрный",
+        "hex": "#1A1A1A"
+      }
+    ]
+  },
+  {
+    "id": 41,
+    "name": "Zombie Yard Mousepad",
+    "price": 95000,
+    "size": "100x50, 120x60",
+    "photo": "kovrik PVZ.jpg",
+    "description": "Коврик для мыши в стиле Plants vs Zombies — выбери свой уголок двора",
+    "type": "mousepad",
+    "colors": [
+      {
+        "label": "Бассейн",
+        "hex": "#4FC3E8"
+      },
+      {
+        "label": "Крыша",
+        "hex": "#C1553A"
+      },
+      {
+        "label": "Газон",
+        "hex": "#5FA83C"
+      }
+    ],
+    "sizePrices": {
+      "100x50": 95000,
+      "120x60": 110000
+    }
+  },
+  {
+    "id": 42,
+    "name": "Rockstar Games Tee",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "Rockstar gta t shirt.jpg",
+    "description": "Оверсайз футболка с культовым логотипом Rockstar Games",
+    "type": "jersey",
+    "colors": [
+      {
+        "label": "Чёрный",
+        "hex": "#1A1A1A"
+      },
+      {
+        "label": "Белый",
+        "hex": "#FFFFFF"
+      }
+    ]
+  },
+  {
+    "id": 43,
+    "name": "Gym Hub Tee",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "gym hub.jpg",
+    "description": "Оверсайз футболка Gym Hub — стиль для зала и улицы",
+    "type": "jersey",
+    "colors": [
+      {
+        "label": "Чёрный",
+        "hex": "#1A1A1A"
+      },
+      {
+        "label": "Белый",
+        "hex": "#FFFFFF"
+      }
+    ]
+  },
+  {
+    "id": 44,
+    "name": "Peach Tee",
+    "price": 189000,
+    "size": "S, M, L, XL",
+    "photo": "nmadur.jpg",
+    "description": "Мем-футболка с забавным принтом — топ выбор для тех, кто любит юмор",
+    "type": "jersey",
+    "colors": [
+      {
+        "label": "Чёрный",
+        "hex": "#1A1A1A"
+      },
+      {
+        "label": "Белый",
+        "hex": "#FFFFFF"
+      }
+    ]
+  },
+  {
+    "id": 45,
+    "name": "CS2 Art Portrait",
+    "price": 89000,
+    "size": "A4, A3",
+    "photo": "cs2 portret.jpg",
+    "description": "Постер в раме — CS2 в стиле классической живописи. Три уникальных сюжета на выбор",
+    "type": "poster",
+    "variants": [
+      "Мародёр",
+      "Крик CS2",
+      "Агент FBI"
+    ],
+    "sizePrices": {
+      "A4": 89000,
+      "A3": 129000
+    }
   }
 ]
