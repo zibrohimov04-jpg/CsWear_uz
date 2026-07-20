@@ -596,6 +596,7 @@
     <button class="filter-chip" onclick="filterCatalog('mousepad',this)">🖱 Коврики</button>
     <button class="filter-chip" onclick="filterCatalog('flag',this)">🚩 Флаги</button>
     <button class="filter-chip" onclick="filterCatalog('pillow',this)">🛋 Подушки</button>
+    <button class="filter-chip" onclick="filterCatalog('poster',this)">🖼 Постеры</button>
   </div>
   <div class="grid" id="catalogGrid"></div>
 </div>
@@ -663,6 +664,12 @@
     <div class="option-section" id="flagSection" style="display:none">
       <div class="option-label">📐 Размер флага</div>
       <div class="option-chips" id="flagChips"></div>
+    </div>
+
+    <!-- Poster sizes -->
+    <div class="option-section" id="posterSizeSection" style="display:none">
+      <div class="option-label">📐 Размер постера</div>
+      <div class="option-chips" id="posterSizeChips"></div>
     </div>
 
     <!-- Color variants -->
@@ -858,6 +865,7 @@
     <button class="filter-chip" onclick="setFilter('mousepad',this)">🖱 Коврики</button>
     <button class="filter-chip" onclick="setFilter('flag',this)">🚩 Флаги</button>
     <button class="filter-chip" onclick="setFilter('pillow',this)">🛋 Подушки</button>
+    <button class="filter-chip" onclick="setFilter('poster',this)">🖼 Постеры</button>
   </div>
   <div class="grid" id="searchResults"></div>
   <div class="empty-search" id="emptySearch" style="display:none">
@@ -954,7 +962,7 @@ const USER_ID = tg?.initDataUnsafe?.user?.id
   || (() => { const id = 'u' + Date.now(); localStorage.setItem('csw_uid', id); return id; })();
 
 
-let products = [], cart = {}, currentProduct = null, selectedVariant = null, selectedSize = null, selectedPhone = null, selectedPadSize = null, selectedColor = null, selectedFlagSize = null, activePromo = null, deliveryLocation = null, pendingOrder = null, map = null, marker = null;
+let products = [], cart = {}, currentProduct = null, selectedVariant = null, selectedSize = null, selectedPhone = null, selectedPadSize = null, selectedColor = null, selectedFlagSize = null, selectedPosterSize = null, activePromo = null, deliveryLocation = null, pendingOrder = null, map = null, marker = null;
 
 function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -992,18 +1000,7 @@ function renderHome() {
 
 // ── CATALOG ──
 function renderCatalog() {
-  document.getElementById('catalogGrid').innerHTML = products.map(p => {
-    const tag = p.type === 'case' ? '📱 Чехол' : p.type === 'mousepad' ? '🖱 Коврик' : p.type === 'flag' ? '🚩 Флаг' : p.type === 'pillow' ? '🛋 Подушка' : p.type === 'toy' ? '🧸 Игрушка' : '👕 Джерси';
-    const priceLabel = (p.type === 'mousepad' || p.type === 'flag') ? 'от ' + money(p.price) : money(p.price);
-    return `<div class="card" onclick="openProduct(${p.id})">
-      <img src="${p.photo}" alt="${p.name}" loading="lazy">
-      <div class="card-body">
-        <div class="card-name">${p.name}</div>
-        <div class="card-price">${priceLabel}</div>
-        <div class="card-tag">${tag}</div>
-      </div>
-    </div>`;
-  }).join('');
+  document.getElementById('catalogGrid').innerHTML = products.map(p => buildCard(p)).join('');
 }
 
 // ── PRODUCT PAGE ──
@@ -1019,7 +1016,7 @@ function openProduct(id) {
   currentProduct = products.find(p => p.id == id);
   if (!currentProduct) return;
   addToRecent(id);
-  selectedVariant = null; selectedSize = null; selectedPhone = null; selectedPadSize = null;
+  selectedVariant = null; selectedSize = null; selectedPhone = null; selectedPadSize = null; selectedPosterSize = null;
 
   document.getElementById('productPageImg').src = currentProduct.photo;
   document.getElementById('productPageName').textContent = currentProduct.name;
@@ -1042,7 +1039,7 @@ function openProduct(id) {
 
   // Reset all option sections
   selectedColor = null; selectedFlagSize = null;
-  ['variantSection','sizeSection','padSection','phoneSection','colorSection','flagSection'].forEach(sid => {
+  ['variantSection','sizeSection','padSection','phoneSection','colorSection','flagSection','posterSizeSection'].forEach(sid => {
     document.getElementById(sid).style.display = 'none';
   });
 
@@ -1099,6 +1096,24 @@ function openProduct(id) {
       const qtyHint = existing ? ` <span style="font-size:10px;opacity:0.8">(${existing[1].qty})</span>` : '';
       return `<button class="option-chip price-chip" onclick="selectFlag('${size}', ${price}, this)">
         <span class="chip-size">${size} см${qtyHint}</span>
+        <span class="chip-price">${money(price)}</span>
+      </button>`;
+    }).join('');
+  }
+
+  if (currentProduct.type === 'poster') {
+    if (currentProduct.variants && currentProduct.variants.length > 0) {
+      document.getElementById('variantSection').style.display = 'block';
+      document.getElementById('variantChips').innerHTML = currentProduct.variants.map(v =>
+        `<button class="option-chip" onclick="selectVariant('${v}', this)">${v}</button>`
+      ).join('');
+    }
+    document.getElementById('posterSizeSection').style.display = 'block';
+    document.getElementById('posterSizeChips').innerHTML = Object.entries(currentProduct.sizePrices).map(([size, price]) => {
+      const existing = Object.entries(cart).find(([k]) => k.endsWith(`_${size}`) && k.startsWith(`${currentProduct.id}_`));
+      const qtyHint = existing ? ` <span style="font-size:10px;opacity:0.8">(${existing[1].qty})</span>` : '';
+      return `<button class="option-chip price-chip" onclick="selectPosterSize('${size}', ${price}, this)">
+        <span class="chip-size">${size}${qtyHint}</span>
         <span class="chip-price">${money(price)}</span>
       </button>`;
     }).join('');
@@ -1178,6 +1193,15 @@ function selectFlag(size, price, el) {
   updateCounterState();
 }
 
+function selectPosterSize(size, price, el) {
+  selectedPosterSize = size;
+  document.getElementById('productPagePrice').textContent = money(price);
+  document.getElementById('stickyPrice').textContent = money(price);
+  document.querySelectorAll('#posterSizeChips .option-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  updateCounterState();
+}
+
 function selectColor(label, el) {
   selectedColor = label;
   document.querySelectorAll('#colorChips .color-chip').forEach(c => c.classList.remove('selected'));
@@ -1230,6 +1254,11 @@ function getProductKey() {
   } else if (p.type === 'flag') {
     if (!selectedFlagSize) { alert('Выберите размер флага'); return null; }
     return { key: `${p.id}_${selectedFlagSize}`, size: `${selectedFlagSize} см`, price: p.sizePrices[selectedFlagSize] };
+  } else if (p.type === 'poster') {
+    if (p.variants && p.variants.length > 0 && !selectedVariant) { alert('Выберите дизайн'); return null; }
+    if (!selectedPosterSize) { alert('Выберите размер постера'); return null; }
+    const posterLabel = selectedVariant ? `${selectedVariant} | ${selectedPosterSize}` : selectedPosterSize;
+    return { key: `${p.id}_${selectedVariant||''}_${selectedPosterSize}`, size: posterLabel, price: p.sizePrices[selectedPosterSize] };
   }
   return null;
 }
@@ -1452,7 +1481,7 @@ function normalize(str) {
 
 function matchesQuery(p, q) {
   if (!q) return true;
-  const typeLabels = { jersey: 'джерси футболка', case: 'чехол', mousepad: 'коврик ковер', flag: 'флаг', pillow: 'подушка', toy: 'игрушка мягкая' };
+  const typeLabels = { jersey: 'джерси футболка', case: 'чехол', mousepad: 'коврик ковер', flag: 'флаг', pillow: 'подушка', toy: 'игрушка мягкая', poster: 'постер картина принт' };
   const extended = normalize(
     p.name + ' ' + (p.description||'') + ' ' + p.type + ' ' + (typeLabels[p.type]||'')
   );
@@ -1523,8 +1552,8 @@ function getBadge(p) {
 
 // ── CARD BUILDER (shared) ──
 function buildCard(p) {
-  const tag = p.type === 'case' ? '📱 Чехол' : p.type === 'mousepad' ? '🖱 Коврик' : p.type === 'flag' ? '🚩 Флаг' : p.type === 'pillow' ? '🛋 Подушка' : p.type === 'toy' ? '🧸 Игрушка' : '👕 Джерси';
-  const priceLabel = (p.type === 'mousepad' || p.type === 'flag') ? 'от ' + money(p.price) : money(p.price);
+  const tag = p.type === 'case' ? '📱 Чехол' : p.type === 'mousepad' ? '🖱 Коврик' : p.type === 'flag' ? '🚩 Флаг' : p.type === 'pillow' ? '🛋 Подушка' : p.type === 'toy' ? '🧸 Игрушка' : p.type === 'poster' ? '🖼 Постер' : '👕 Джерси';
+  const priceLabel = (p.type === 'mousepad' || p.type === 'flag' || p.type === 'poster') ? 'от ' + money(p.price) : money(p.price);
   return `<div class="card" onclick="openProduct(${p.id})">
     ${getBadge(p)}
     <img src="${p.photo}" alt="${p.name}" loading="lazy">
